@@ -185,7 +185,6 @@
 </footer>
 
 <!-- ═══════════ JAVASCRIPT ═══════════ -->
-<script src="js/data.js"></script>
 <script>
 var allVendors = [];
 var searchTimer;
@@ -200,24 +199,21 @@ document.getElementById('filterArena').addEventListener('change', applyFilters);
 
 loadVendors();
 
-// ── Load vendors from static data ──
-function loadVendors() {
-    var arenaMap = {};
-    (typeof ARENAS !== 'undefined' ? ARENAS : []).forEach(function(a) { arenaMap[a.slug] = a; });
-
-    allVendors = (typeof VENDORS !== 'undefined' ? VENDORS : []).map(function(v) {
-        var arena = arenaMap[v.arena_slug] || {};
-        return Object.assign({}, v, {
-            arena_id: v.arena_slug,
-            arena_name: arena.name || null,
-            arena_city: arena.city || v.city || null,
-            arena_state: arena.state || v.state || null
-        });
-    });
-
-    if (!filtersPopulated) populateFilters(allVendors);
-    updateStats(allVendors);
-    applyFilters();
+// ── Load vendors from D1 API ──
+async function loadVendors() {
+    try {
+        const res = await fetch('/api/vendors?limit=500');
+        const data = await res.json();
+        allVendors = data.vendors || [];
+        if (!filtersPopulated) populateFilters(allVendors);
+        updateStats(allVendors);
+        applyFilters();
+    } catch (err) {
+        console.error('Failed to load vendors:', err);
+        document.getElementById('loadingState').classList.add('hidden');
+        document.getElementById('emptyState').classList.remove('hidden');
+        document.getElementById('resultHeading').textContent = 'Error loading vendors';
+    }
 }
 
 // ── Populate arena filter dropdown ──

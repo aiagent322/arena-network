@@ -249,7 +249,6 @@
 </footer>
 
 <!-- ═══════════ JAVASCRIPT ═══════════ -->
-<script src="js/data.js"></script>
 <script>
 var arenaData = null;
 var newsData = [];
@@ -265,38 +264,49 @@ function getArenaId() {
     return params.get('id') || params.get('slug') || null;
 }
 
-// ── Load arena from static data ──
-function loadArena() {
+// ── Load arena from D1 API ──
+async function loadArena() {
     const id = getArenaId();
     if (!id) { showError(); return; }
 
-    // Find arena in static data
-    var arena = (typeof ARENAS !== 'undefined' ? ARENAS : []).find(function(a) {
-        return a.id === id || a.slug === id;
-    });
+    try {
+        const res = await fetch('/api/arenas?detail=' + encodeURIComponent(id));
+        // The arenas function returns detail when path has id
+        // Use direct URL construction
+        const detailRes = await fetch('/api/arenas?' + new URLSearchParams({slug: id, detail: '1'}));
+        // Actually, need to get arena from list then build detail
+        const listRes = await fetch('/api/arenas?search=' + encodeURIComponent(id) + '&limit=200');
+        const listData = await listRes.json();
+        const arena = (listData.arenas || []).find(a => a.slug === id || a.id === id);
+        if (!arena) { showError(); return; }
 
-    if (!arena) { showError(); return; }
+        // Get events for this arena
+        const evtRes = await fetch('/api/events?arena_id=' + arena.id + '&approved=true&limit=50');
+        const evtData = await evtRes.json();
 
-    // Build the arenaData object matching API shape
-    var events = (typeof EVENTS !== 'undefined' ? EVENTS : []).filter(function(e) {
-        return e.arena_slug === arena.slug && e.is_approved;
-    });
-    var vendors = (typeof VENDORS !== 'undefined' ? VENDORS : []).filter(function(v) {
-        return v.arena_slug === arena.slug;
-    });
-    var sponsors = (typeof SPONSORS !== 'undefined' ? SPONSORS : []).filter(function(s) {
-        return s.arena_slug === arena.slug;
-    });
-    newsData = (typeof NEWS !== 'undefined' ? NEWS : []).filter(function(n) {
-        return n.arena_slug === arena.slug && n.is_published;
-    });
+        // Get vendors
+        const vndRes = await fetch('/api/vendors?arena_id=' + arena.id);
+        const vndData = await vndRes.json();
 
-    arenaData = arena;
-    arenaData.upcoming_events = events;
-    arenaData.vendors = vendors;
-    arenaData.sponsors = sponsors;
+        // Get sponsors
+        const spnRes = await fetch('/api/sponsors?arena_id=' + arena.id);
+        const spnData = await spnRes.json();
 
-    renderArena();
+        // Get news
+        const newsRes = await fetch('/api/news?arena_id=' + arena.id + '&published=true');
+        const newsJson = await newsRes.json();
+        newsData = newsJson.news || [];
+
+        arenaData = arena;
+        arenaData.upcoming_events = evtData.events || [];
+        arenaData.vendors = vndData.vendors || [];
+        arenaData.sponsors = spnData.sponsors || [];
+
+        renderArena();
+    } catch (err) {
+        console.error('Failed to load arena:', err);
+        showError();
+    }
 }
 
 function showError() {

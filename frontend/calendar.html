@@ -192,7 +192,6 @@
 </footer>
 
 <!-- ═══════════ JAVASCRIPT ═══════════ -->
-<script src="js/data.js"></script>
 <script>
 const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
@@ -227,8 +226,8 @@ function goToday() {
     loadMonth();
 }
 
-// ── Load events from static data ──
-function loadMonth() {
+// ── Load events from D1 API ──
+async function loadMonth() {
     document.getElementById('monthLabel').textContent = `${MONTHS[curMonth]} ${curYear}`;
 
     const first = new Date(curYear, curMonth, 1);
@@ -239,28 +238,18 @@ function loadMonth() {
     const startStr = toDateStr(startPad);
     const endStr   = toDateStr(endPad);
 
-    // Build events from static data with arena info joined
-    var arenaMap = {};
-    (typeof ARENAS !== 'undefined' ? ARENAS : []).forEach(function(a) { arenaMap[a.slug] = a; });
-
-    allEvents = (typeof EVENTS !== 'undefined' ? EVENTS : []).filter(function(e) {
-        if (!e.is_approved) return false;
-        var sd = e.start_date;
-        var ed = e.end_date || e.start_date;
-        return ed >= startStr && sd <= endStr;
-    }).map(function(e) {
-        var arena = arenaMap[e.arena_slug] || {};
-        return Object.assign({}, e, {
-            id: e.slug,
-            arena_id: e.arena_slug,
-            arena_name: arena.name || null,
-            arena_city: arena.city || null,
-            arena_state: arena.state || null
-        });
-    });
-
-    if (!filtersPopulated) populateFilterOptions(allEvents);
-    applyFilters();
+    try {
+        const res = await fetch(`/api/events?start=${startStr}&end=${endStr}&approved=true&limit=500`);
+        const data = await res.json();
+        allEvents = data.events || [];
+        if (!filtersPopulated) populateFilterOptions(allEvents);
+        applyFilters();
+    } catch (err) {
+        console.error('Failed to load events:', err);
+        allEvents = [];
+        filteredEvents = [];
+        renderAll();
+    }
 }
 
 // ── Populate filter dropdowns (once, from first load) ──

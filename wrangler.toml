@@ -1,0 +1,8 @@
+name = "arena-network"
+compatibility_date = "2026-03-16"
+pages_build_output_dir = "frontend"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "arena-network-db"
+database_id = "f735bbac-f59d-46e4-a4e5-53eba7725368"
