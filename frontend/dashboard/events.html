@@ -1,596 +1,309 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Event Manager — Arena Network Dashboard</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Event Manager — Arena Network</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bitter:wght@600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--navy:#0B1D3A;--navy2:#091730;--navy3:#071225;--gold:#C8993C;--cream:#FAF6EF;--cream2:#F2EBE0;--cream3:#E8DFD0;--rust:#9B4D2B;--sage:#5A7247;--white:#FFF;--r:10px}
+body{font-family:'DM Sans',system-ui,sans-serif;background:var(--navy2);color:var(--cream);-webkit-text-size-adjust:100%}
+h1,h2,h3{font-family:'Bitter',Georgia,serif}
+a{text-decoration:none;color:inherit}
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config={theme:{extend:{colors:{navy:{50:'#E8ECF2',100:'#C5CEE0',400:'#3C5A8A',500:'#0B1D3A',600:'#091730',700:'#071225'},gold:{50:'#FDF8EE',100:'#F9EDCC',300:'#E8C46D',400:'#C8993C',500:'#B5882F',600:'#9A7226'},cream:{50:'#FEFDFB',100:'#FAF6EF',200:'#F2EBE0',300:'#E8DFD0'},rust:{400:'#B85A3A',500:'#9B4D2B',600:'#7F3E22'},sage:{400:'#6D8A56',500:'#5A7247',600:'#4A5E3B'}},fontFamily:{display:['Bitter','Georgia','serif'],body:['DM Sans','system-ui','sans-serif']}}}}
-    </script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bitter:wght@500;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+/* Phone: no sidebar, just top bar + drawer */
+.side{display:none}
+.drawer-bg{display:none;position:fixed;inset:0;background:rgba(7,18,37,.6);z-index:40}
+.drawer-bg.on{display:block}
+.drawer{position:fixed;top:0;left:0;bottom:0;width:260px;background:var(--navy3);z-index:50;transform:translateX(-100%);transition:transform .3s}
+.drawer.on{transform:translateX(0)}
+.drawer-hdr{height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;border-bottom:1px solid rgba(200,153,60,.08)}
+.drawer-hdr span{font-family:'Bitter',serif;font-weight:700;color:var(--gold);font-size:14px}
+.drawer-x{width:36px;height:36px;border-radius:8px;background:var(--navy);display:flex;align-items:center;justify-content:center;border:0;cursor:pointer;color:rgba(250,246,239,.3)}
+.drawer-x svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.5}
+.drawer nav{padding:12px}
+.drawer nav a{display:block;padding:12px;border-radius:8px;font-size:13px;font-weight:600;color:rgba(250,246,239,.35);margin-bottom:2px}
+.drawer nav a.on{color:var(--gold);background:rgba(200,153,60,.08)}
 
-    <style>
-        body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;opacity:0.02;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
-        @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}.fade-in{animation:fadeIn .3s ease-out forwards}
-        @keyframes toastIn{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:translateY(0)}}
-        @keyframes toastOut{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-12px)}}
-        .toast-enter{animation:toastIn .25s ease-out forwards}.toast-exit{animation:toastOut .2s ease-in forwards}
-        .mobile-drawer{transform:translateX(-100%);transition:transform .3s ease}.mobile-drawer.open{transform:translateX(0)}
-        textarea,input,select{font-family:'DM Sans',system-ui,sans-serif}
-        ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:#091730}::-webkit-scrollbar-thumb{background:#C8993C;border-radius:3px}
-        /* Sort indicator */
-        .sort-btn::after{content:'';display:inline-block;width:0;height:0;margin-left:4px;vertical-align:middle;border-left:3px solid transparent;border-right:3px solid transparent;border-top:4px solid currentColor;opacity:0.3}
-        .sort-btn.asc::after{border-top:0;border-bottom:4px solid currentColor;opacity:0.7}
-        .sort-btn.desc::after{opacity:0.7}
-    </style>
+.topbar{height:56px;background:var(--navy);border-bottom:1px solid rgba(200,153,60,.08);display:flex;align-items:center;justify-content:space-between;padding:0 16px}
+.topbar h1{font-size:16px;font-weight:700;color:var(--cream)}
+.hbtn{width:48px;height:48px;display:flex;align-items:center;justify-content:center;background:var(--navy2);border-radius:8px;border:0;cursor:pointer}
+.hbtn svg{width:20px;height:20px;stroke:var(--gold);fill:none;stroke-width:2}
+
+.wrap{padding:16px}
+
+/* Stats */
+.srow{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:16px}
+.sbox{background:var(--navy);border:1px solid rgba(200,153,60,.08);border-radius:var(--r);padding:12px;text-align:center}
+.sbox b{display:block;font-family:'Bitter',serif;font-weight:800;font-size:20px;color:var(--gold);line-height:1}
+.sbox small{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:rgba(250,246,239,.2);margin-top:2px;display:block}
+
+/* Actions */
+.abar{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+.ain{width:100%;padding:12px;font-size:14px;background:var(--navy);border:1px solid rgba(200,153,60,.08);border-radius:var(--r);color:var(--cream);font-family:inherit}
+.ain:focus{outline:0;border-color:rgba(200,153,60,.25)}
+.ain::placeholder{color:rgba(250,246,239,.15)}
+.abtn{padding:14px;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;background:var(--gold);color:var(--navy);border:0;border-radius:var(--r);cursor:pointer;font-family:inherit;min-height:48px;white-space:nowrap}
+
+/* Form */
+.fpanel{display:none;background:var(--navy);border:1px solid rgba(200,153,60,.1);border-radius:var(--r);margin-bottom:16px;overflow:hidden}
+.fpanel.on{display:block}
+.fpanel-hdr{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid rgba(200,153,60,.08)}
+.fpanel-hdr h2{font-size:14px;font-weight:700}
+.fpanel-body{padding:16px}
+.fgroup{margin-bottom:12px}
+.fgroup label{display:block;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:rgba(250,246,239,.25);margin-bottom:4px}
+.fgroup input,.fgroup select,.fgroup textarea{width:100%;padding:12px;background:var(--navy2);border:1px solid rgba(200,153,60,.08);border-radius:8px;color:var(--cream);font-size:14px;font-family:inherit;-webkit-appearance:none;appearance:none}
+.fgroup input:focus,.fgroup select:focus,.fgroup textarea:focus{outline:0;border-color:rgba(200,153,60,.25)}
+.frow2{display:flex;flex-direction:column;gap:12px}
+.factions{display:flex;flex-wrap:wrap;gap:8px;padding-top:12px;border-top:1px solid rgba(200,153,60,.08)}
+.factions button{padding:12px 20px;border-radius:8px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;border:0;cursor:pointer;font-family:inherit;min-height:48px}
+.btn-save{background:var(--gold);color:var(--navy)}
+.btn-cancel{background:0;border:1px solid rgba(200,153,60,.15);color:rgba(200,153,60,.4)}
+
+/* Event list */
+.elist{display:flex;flex-direction:column;gap:8px}
+.ev{background:var(--navy);border:1px solid rgba(200,153,60,.08);border-radius:var(--r);padding:14px}
+.ev h3{font-size:14px;font-weight:700;margin-bottom:4px}
+.ev .meta{font-size:12px;color:rgba(250,246,239,.3)}
+.ev .acts{display:flex;flex-wrap:wrap;gap:4px;margin-top:10px;padding-top:8px;border-top:1px solid rgba(200,153,60,.05)}
+.ev .acts button{padding:8px 14px;border-radius:6px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;border:0;cursor:pointer;font-family:inherit;min-height:40px;background:rgba(200,153,60,.05);color:rgba(200,153,60,.4)}
+.ev .acts button:active{background:rgba(200,153,60,.1)}
+.ev .acts .del{color:rgba(155,77,43,.5);margin-left:auto}
+.badge{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;text-transform:uppercase}
+.badge-ok{background:rgba(90,114,71,.12);color:var(--sage)}
+.badge-pend{background:rgba(155,77,43,.12);color:var(--rust)}
+
+.toast-wrap{position:fixed;top:64px;right:16px;z-index:60}
+.toast{padding:10px 16px;border-radius:8px;font-size:12px;font-weight:700;margin-bottom:6px;animation:tin .2s ease-out}
+.toast-ok{background:var(--sage);color:var(--white)}
+.toast-err{background:var(--rust);color:var(--white)}
+@keyframes tin{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+
+.empty{text-align:center;padding:40px 16px;color:rgba(250,246,239,.15);font-size:13px}
+
+@media(min-width:640px){
+  .abar{flex-direction:row;align-items:flex-end}
+  .abar>*:first-child{flex:1}
+  .abtn{width:auto;padding:12px 24px}
+  .frow2{flex-direction:row}
+  .frow2>*{flex:1}
+  .srow{grid-template-columns:repeat(4,1fr)}
+}
+@media(min-width:1024px){
+  .hbtn{display:none}
+  .side{display:flex;flex-direction:column;width:220px;flex-shrink:0;background:var(--navy3);border-right:1px solid rgba(200,153,60,.08);position:fixed;top:0;bottom:0;left:0;z-index:30}
+  .side-hdr{height:56px;display:flex;align-items:center;padding:0 16px;border-bottom:1px solid rgba(200,153,60,.08)}
+  .side-hdr a{display:flex;align-items:center;gap:8px}
+  .side-hdr .si{width:28px;height:28px;background:var(--gold);border-radius:7px;display:flex;align-items:center;justify-content:center}
+  .side-hdr .si svg{width:14px;height:14px;stroke:var(--navy);fill:none;stroke-width:2.2}
+  .side-hdr span{font-family:'Bitter',serif;font-weight:700;color:var(--gold);font-size:13px}
+  .side nav{padding:12px;flex:1}
+  .side nav a{display:block;padding:10px 12px;border-radius:8px;font-size:13px;font-weight:600;color:rgba(250,246,239,.3);margin-bottom:2px}
+  .side nav a:hover{color:var(--gold);background:rgba(200,153,60,.05)}
+  .side nav a.on{color:var(--gold);background:rgba(200,153,60,.08)}
+  .side-ft{padding:12px;border-top:1px solid rgba(200,153,60,.08)}
+  .side-ft a{font-size:11px;color:rgba(250,246,239,.2);display:flex;align-items:center;gap:6px;padding:8px}
+  .page{margin-left:220px}
+}
+</style>
 </head>
+<body>
 
-<body class="bg-navy-600 text-cream-100 font-body min-h-screen">
+<!-- Desktop sidebar -->
+<aside class="side">
+  <div class="side-hdr"><a href="../index.html"><div class="si"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18"/></svg></div><span>ARENA NET</span></a></div>
+  <nav>
+    <a href="dashboard.html">Overview</a>
+    <a href="events.html" class="on">Events</a>
+    <a href="news.html">News</a>
+    <a href="analytics.html">Analytics</a>
+  </nav>
+  <div class="side-ft"><a href="../index.html">← Back to Site</a></div>
+</aside>
 
-<div class="flex min-h-screen">
-
-    <!-- ═══════════ SIDEBAR ═══════════ -->
-    <aside class="hidden lg:flex flex-col w-60 flex-shrink-0 bg-navy-700 border-r border-gold-400/10">
-        <div class="h-16 flex items-center px-5 border-b border-gold-400/10">
-            <a href="../index.html" class="flex items-center gap-2">
-                <div class="w-8 h-8 rounded-lg bg-gold-400 flex items-center justify-center">
-                    <svg class="w-4 h-4 text-navy-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21"/></svg>
-                </div>
-                <span class="font-display font-700 text-gold-400 text-sm tracking-wide">ARENA NET</span>
-            </a>
-        </div>
-        <nav class="flex-1 py-4 px-3 space-y-0.5 overflow-y-auto">
-            <a href="dashboard.html#profile" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold text-cream-300/40 hover:text-gold-400 hover:bg-gold-400/5 transition-all">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21"/></svg>
-                Arena Profile</a>
-            <a href="events.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold text-gold-400 bg-gold-400/10 transition-all">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"/></svg>
-                Event Manager</a>
-            <a href="dashboard.html#vendors" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold text-cream-300/40 hover:text-gold-400 hover:bg-gold-400/5 transition-all">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.349"/></svg>
-                Vendors</a>
-            <a href="dashboard.html#sponsors" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold text-cream-300/40 hover:text-gold-400 hover:bg-gold-400/5 transition-all">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z"/></svg>
-                Sponsors</a>
-            <a href="dashboard.html#news" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold text-cream-300/40 hover:text-gold-400 hover:bg-gold-400/5 transition-all">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 0 1-2.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 0 0 2.25 2.25h13.5"/></svg>
-                News</a>
-            <a href="dashboard.html#analytics" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold text-cream-300/40 hover:text-gold-400 hover:bg-gold-400/5 transition-all">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z"/></svg>
-                Analytics</a>
-        </nav>
-        <div class="p-3 border-t border-gold-400/10">
-            <a href="../index.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-cream-300/30 hover:text-gold-400 hover:bg-gold-400/5 transition-all text-xs font-semibold">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"/></svg>
-                Back to Site</a>
-        </div>
-    </aside>
-
-    <!-- ── MOBILE DRAWER ── -->
-    <div id="drawerBg" class="fixed inset-0 bg-navy-700/60 z-40 hidden lg:hidden" onclick="toggleDrawer()"></div>
-    <aside id="drawer" class="mobile-drawer fixed inset-y-0 left-0 w-64 bg-navy-700 z-50 lg:hidden flex flex-col">
-        <div class="h-16 flex items-center justify-between px-5 border-b border-gold-400/10">
-            <span class="font-display font-700 text-gold-400 text-sm">EVENT MANAGER</span>
-            <button onclick="toggleDrawer()" class="w-8 h-8 rounded-lg bg-navy-500 flex items-center justify-center text-cream-300/40 hover:text-gold-400">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
-            </button>
-        </div>
-        <nav class="flex-1 py-4 px-3 space-y-0.5 overflow-y-auto">
-            <a href="dashboard.html#profile" class="block px-3 py-2.5 rounded-lg text-sm font-semibold text-cream-300/40 hover:bg-gold-400/5">Arena Profile</a>
-            <a href="events.html" class="block px-3 py-2.5 rounded-lg text-sm font-semibold text-gold-400 bg-gold-400/10">Event Manager</a>
-            <a href="dashboard.html#vendors" class="block px-3 py-2.5 rounded-lg text-sm font-semibold text-cream-300/40 hover:bg-gold-400/5">Vendors</a>
-            <a href="dashboard.html#sponsors" class="block px-3 py-2.5 rounded-lg text-sm font-semibold text-cream-300/40 hover:bg-gold-400/5">Sponsors</a>
-            <a href="dashboard.html#news" class="block px-3 py-2.5 rounded-lg text-sm font-semibold text-cream-300/40 hover:bg-gold-400/5">News</a>
-            <a href="dashboard.html#analytics" class="block px-3 py-2.5 rounded-lg text-sm font-semibold text-cream-300/40 hover:bg-gold-400/5">Analytics</a>
-        </nav>
-    </aside>
-
-    <!-- ═══════════ MAIN ═══════════ -->
-    <div class="flex-1 flex flex-col min-w-0">
-
-        <!-- Top bar -->
-        <header class="h-16 bg-navy-500 border-b border-gold-400/10 flex items-center justify-between px-4 sm:px-6 flex-shrink-0">
-            <div class="flex items-center gap-3">
-                <button onclick="toggleDrawer()" class="lg:hidden w-9 h-9 rounded-lg bg-navy-600 flex items-center justify-center text-gold-400">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/></svg>
-                </button>
-                <h1 class="font-display font-700 text-lg text-cream-100">Event Manager</h1>
-            </div>
-            <div class="flex items-center gap-3">
-                <span id="eventCountBadge" class="px-2.5 py-0.5 rounded-full bg-gold-400/10 text-gold-400 text-[10px] font-bold uppercase tracking-wider"></span>
-                <a href="../calendar.html" class="hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold text-cream-300/30 hover:text-gold-400 transition-colors">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"/></svg>
-                    Public Calendar</a>
-            </div>
-        </header>
-
-        <!-- Content -->
-        <main class="flex-1 overflow-y-auto p-4 sm:p-6">
-
-            <!-- ── Toast container ── -->
-            <div id="toastContainer" class="fixed top-20 right-4 sm:right-6 z-50 space-y-2"></div>
-
-            <!-- ── Stats row ── -->
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
-                <div class="bg-navy-500 rounded-xl border border-gold-400/10 p-4 text-center">
-                    <div id="statTotal" class="font-display font-800 text-2xl text-gold-400 leading-none">—</div>
-                    <div class="text-[10px] font-semibold uppercase tracking-wider text-cream-300/25 mt-1">Total Events</div>
-                </div>
-                <div class="bg-navy-500 rounded-xl border border-gold-400/10 p-4 text-center">
-                    <div id="statApproved" class="font-display font-800 text-2xl text-sage-400 leading-none">—</div>
-                    <div class="text-[10px] font-semibold uppercase tracking-wider text-cream-300/25 mt-1">Approved</div>
-                </div>
-                <div class="bg-navy-500 rounded-xl border border-gold-400/10 p-4 text-center">
-                    <div id="statPending" class="font-display font-800 text-2xl text-rust-400 leading-none">—</div>
-                    <div class="text-[10px] font-semibold uppercase tracking-wider text-cream-300/25 mt-1">Pending</div>
-                </div>
-                <div class="bg-navy-500 rounded-xl border border-gold-400/10 p-4 text-center">
-                    <div id="statUpcoming" class="font-display font-800 text-2xl text-gold-300 leading-none">—</div>
-                    <div class="text-[10px] font-semibold uppercase tracking-wider text-cream-300/25 mt-1">Upcoming</div>
-                </div>
-            </div>
-
-            <!-- ── Action bar ── -->
-            <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 mb-5">
-                <div class="flex-1 relative">
-                    <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-cream-300/20" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-                    <input id="searchInput" type="text" placeholder="Search events..." class="w-full pl-10 pr-4 py-2.5 bg-navy-500 border border-gold-400/10 rounded-lg text-sm text-cream-100 placeholder:text-cream-300/15 focus:outline-none focus:border-gold-400/30 transition-colors">
-                </div>
-                <div class="flex gap-2">
-                    <select id="filterStatus" onchange="renderTable()" class="py-2.5 px-3 bg-navy-500 border border-gold-400/10 rounded-lg text-sm text-cream-100 focus:outline-none focus:border-gold-400/30 appearance-none pr-8 transition-colors" style="background-image:url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%228%22%3E%3Cpath d=%221 1l5 5 5-5%22 stroke=%22%23C8993C%22 stroke-width=%221.5%22 fill=%22none%22/%3E%3C/svg%3E');background-repeat:no-repeat;background-position:right 10px center">
-                        <option value="">All Status</option>
-                        <option value="approved">Approved</option>
-                        <option value="pending">Pending</option>
-                    </select>
-                    <button onclick="openForm()" class="bg-gold-400 hover:bg-gold-500 text-navy-500 font-bold text-xs px-5 py-2.5 rounded-lg uppercase tracking-wider transition-colors whitespace-nowrap flex items-center gap-1.5">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
-                        Add Event
-                    </button>
-                </div>
-            </div>
-
-            <!-- ── ADD / EDIT FORM ── -->
-            <div id="formPanel" class="hidden mb-6 bg-navy-500 rounded-xl border border-gold-400/15 overflow-hidden fade-in">
-                <div class="flex items-center justify-between px-5 py-3 bg-navy-500 border-b border-gold-400/10">
-                    <h2 id="formTitle" class="font-display font-700 text-sm text-cream-100">Add Event</h2>
-                    <button onclick="closeForm()" class="w-7 h-7 rounded-lg bg-navy-600 flex items-center justify-center text-cream-300/30 hover:text-gold-400 transition-colors">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
-                    </button>
-                </div>
-                <div class="p-5">
-                    <input type="hidden" id="editId">
-
-                    <!-- Row 1: Core fields -->
-                    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-3">
-                        <div>
-                            <label class="text-[10px] font-bold uppercase tracking-wider text-cream-300/30 mb-1 block">Event Title <span class="text-rust-400">*</span></label>
-                            <input id="fTitle" type="text" class="w-full py-2 px-3 bg-navy-600 border border-gold-400/10 rounded-lg text-sm text-cream-100 placeholder:text-cream-300/15 focus:outline-none focus:border-gold-400/40 transition-colors" placeholder="e.g. Arizona Sun Circuit">
-                        </div>
-                        <div>
-                            <label class="text-[10px] font-bold uppercase tracking-wider text-cream-300/30 mb-1 block">Arena</label>
-                            <select id="fArena" class="w-full py-2 px-3 bg-navy-600 border border-gold-400/10 rounded-lg text-sm text-cream-100 focus:outline-none focus:border-gold-400/40 appearance-none transition-colors" style="background-image:url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%228%22%3E%3Cpath d=%221 1l5 5 5-5%22 stroke=%22%23C8993C%22 stroke-width=%221.5%22 fill=%22none%22/%3E%3C/svg%3E');background-repeat:no-repeat;background-position:right 10px center">
-                                <option value="">Select Arena</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="text-[10px] font-bold uppercase tracking-wider text-cream-300/30 mb-1 block">Discipline</label>
-                            <input id="fDiscipline" type="text" class="w-full py-2 px-3 bg-navy-600 border border-gold-400/10 rounded-lg text-sm text-cream-100 placeholder:text-cream-300/15 focus:outline-none focus:border-gold-400/40 transition-colors" placeholder="e.g. team roping, cutting">
-                        </div>
-                    </div>
-
-                    <!-- Row 2: Dates + type -->
-                    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-3 mt-3">
-                        <div>
-                            <label class="text-[10px] font-bold uppercase tracking-wider text-cream-300/30 mb-1 block">Start Date <span class="text-rust-400">*</span></label>
-                            <input id="fStart" type="date" class="w-full py-2 px-3 bg-navy-600 border border-gold-400/10 rounded-lg text-sm text-cream-100 focus:outline-none focus:border-gold-400/40 transition-colors">
-                        </div>
-                        <div>
-                            <label class="text-[10px] font-bold uppercase tracking-wider text-cream-300/30 mb-1 block">End Date</label>
-                            <input id="fEnd" type="date" class="w-full py-2 px-3 bg-navy-600 border border-gold-400/10 rounded-lg text-sm text-cream-100 focus:outline-none focus:border-gold-400/40 transition-colors">
-                        </div>
-                        <div>
-                            <label class="text-[10px] font-bold uppercase tracking-wider text-cream-300/30 mb-1 block">Event Type</label>
-                            <select id="fType" class="w-full py-2 px-3 bg-navy-600 border border-gold-400/10 rounded-lg text-sm text-cream-100 focus:outline-none focus:border-gold-400/40 appearance-none transition-colors" style="background-image:url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%228%22%3E%3Cpath d=%221 1l5 5 5-5%22 stroke=%22%23C8993C%22 stroke-width=%221.5%22 fill=%22none%22/%3E%3C/svg%3E');background-repeat:no-repeat;background-position:right 10px center">
-                                <option value="">Select</option>
-                                <option value="rodeo">Rodeo</option>
-                                <option value="horse show">Horse Show</option>
-                                <option value="roping">Roping</option>
-                                <option value="futurity">Futurity</option>
-                                <option value="clinic">Clinic</option>
-                                <option value="sale">Sale</option>
-                                <option value="fair">Fair</option>
-                                <option value="expo">Expo</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="text-[10px] font-bold uppercase tracking-wider text-cream-300/30 mb-1 block">Entry Fee ($)</label>
-                            <input id="fFee" type="number" step="0.01" class="w-full py-2 px-3 bg-navy-600 border border-gold-400/10 rounded-lg text-sm text-cream-100 placeholder:text-cream-300/15 focus:outline-none focus:border-gold-400/40 transition-colors" placeholder="0.00">
-                        </div>
-                    </div>
-
-                    <!-- Row 3: Promoter, website -->
-                    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-3 mt-3">
-                        <div>
-                            <label class="text-[10px] font-bold uppercase tracking-wider text-cream-300/30 mb-1 block">Promoter</label>
-                            <input id="fPromoter" type="text" class="w-full py-2 px-3 bg-navy-600 border border-gold-400/10 rounded-lg text-sm text-cream-100 placeholder:text-cream-300/15 focus:outline-none focus:border-gold-400/40 transition-colors" placeholder="Promoter or organizer">
-                        </div>
-                        <div>
-                            <label class="text-[10px] font-bold uppercase tracking-wider text-cream-300/30 mb-1 block">Website</label>
-                            <input id="fWebsite" type="url" class="w-full py-2 px-3 bg-navy-600 border border-gold-400/10 rounded-lg text-sm text-cream-100 placeholder:text-cream-300/15 focus:outline-none focus:border-gold-400/40 transition-colors" placeholder="https://...">
-                        </div>
-                        <div>
-                            <label class="text-[10px] font-bold uppercase tracking-wider text-cream-300/30 mb-1 block">Flyer URL</label>
-                            <input id="fFlyer" type="url" class="w-full py-2 px-3 bg-navy-600 border border-gold-400/10 rounded-lg text-sm text-cream-100 placeholder:text-cream-300/15 focus:outline-none focus:border-gold-400/40 transition-colors" placeholder="https://...">
-                        </div>
-                    </div>
-
-                    <!-- Row 4: Description -->
-                    <div class="mt-3">
-                        <label class="text-[10px] font-bold uppercase tracking-wider text-cream-300/30 mb-1 block">Description</label>
-                        <textarea id="fDesc" rows="3" class="w-full py-2 px-3 bg-navy-600 border border-gold-400/10 rounded-lg text-sm text-cream-100 placeholder:text-cream-300/15 focus:outline-none focus:border-gold-400/40 resize-y transition-colors" placeholder="Event details..."></textarea>
-                    </div>
-
-                    <!-- Actions -->
-                    <div class="flex items-center gap-3 mt-5 pt-4 border-t border-gold-400/10">
-                        <button onclick="saveEvent()" class="bg-gold-400 hover:bg-gold-500 text-navy-500 font-bold text-xs px-6 py-2.5 rounded-lg uppercase tracking-wider transition-colors">Save Event</button>
-                        <button onclick="closeForm()" class="border border-gold-400/20 text-gold-400/50 hover:text-gold-400 hover:border-gold-400/40 bg-transparent font-bold text-xs px-5 py-2.5 rounded-lg uppercase tracking-wider transition-colors">Cancel</button>
-                        <div id="formError" class="hidden text-xs font-semibold text-rust-400 ml-2"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ── EVENT TABLE ── -->
-            <div class="bg-navy-500 rounded-xl border border-gold-400/10 overflow-hidden">
-                <div class="overflow-x-auto">
-                    <table class="w-full text-sm">
-                        <thead>
-                            <tr class="border-b border-gold-400/10 text-left">
-                                <th class="py-3 px-4"><button class="sort-btn text-[10px] font-bold uppercase tracking-wider text-cream-300/30 hover:text-cream-300/50 transition-colors" onclick="sortBy('title')">Event</button></th>
-                                <th class="py-3 px-4 hidden md:table-cell"><button class="sort-btn text-[10px] font-bold uppercase tracking-wider text-cream-300/30 hover:text-cream-300/50 transition-colors" onclick="sortBy('arena_name')">Arena</button></th>
-                                <th class="py-3 px-4 hidden lg:table-cell text-[10px] font-bold uppercase tracking-wider text-cream-300/30">Discipline</th>
-                                <th class="py-3 px-4"><button class="sort-btn desc text-[10px] font-bold uppercase tracking-wider text-cream-300/30 hover:text-cream-300/50 transition-colors" onclick="sortBy('start_date')">Date</button></th>
-                                <th class="py-3 px-4 hidden sm:table-cell text-[10px] font-bold uppercase tracking-wider text-cream-300/30">Status</th>
-                                <th class="py-3 px-4 text-right text-[10px] font-bold uppercase tracking-wider text-cream-300/30">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="eventTableBody">
-                            <tr><td colspan="6" class="py-12 text-center text-cream-300/15 text-sm">Loading events...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-        </main>
-    </div>
+<!-- Mobile drawer -->
+<div class="drawer-bg" id="dbg" onclick="tog()"></div>
+<div class="drawer" id="dw">
+  <div class="drawer-hdr"><span>EVENTS</span><button class="drawer-x" onclick="tog()"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M6 18 18 6M6 6l12 12"/></svg></button></div>
+  <nav>
+    <a href="dashboard.html">Overview</a>
+    <a href="events.html" class="on">Events</a>
+    <a href="news.html">News</a>
+    <a href="analytics.html">Analytics</a>
+  </nav>
 </div>
 
-<!-- ═══════════ JAVASCRIPT ═══════════ -->
+<div class="page">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:10px">
+      <button class="hbtn" onclick="tog()"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/></svg></button>
+      <h1>Event Manager</h1>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="toast-wrap" id="tw"></div>
+
+    <div class="srow" id="stats"></div>
+
+    <div class="abar">
+      <div style="position:relative">
+        <input id="si" type="text" class="ain" placeholder="Search events...">
+      </div>
+      <button class="abtn" onclick="openF()">+ Add Event</button>
+    </div>
+
+    <div class="fpanel" id="fp">
+      <div class="fpanel-hdr"><h2 id="fh">New Event</h2><button class="drawer-x" onclick="closeF()"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M6 18 18 6M6 6l12 12"/></svg></button></div>
+      <div class="fpanel-body">
+        <input type="hidden" id="eid">
+        <div class="fgroup"><label>Title *</label><input id="ft" type="text" placeholder="Event name..."></div>
+        <div class="frow2">
+          <div class="fgroup"><label>Arena</label><select id="far"></select></div>
+          <div class="fgroup"><label>Start Date *</label><input id="fsd" type="date"></div>
+        </div>
+        <div class="frow2">
+          <div class="fgroup"><label>End Date</label><input id="fed" type="date"></div>
+          <div class="fgroup"><label>Type</label><select id="fty"><option value="">Select...</option><option value="rodeo">Rodeo</option><option value="horse show">Horse Show</option><option value="futurity">Futurity</option><option value="roping">Roping</option><option value="expo">Expo</option><option value="fair">Fair</option></select></div>
+        </div>
+        <div class="frow2">
+          <div class="fgroup"><label>Discipline</label><input id="fdi" type="text" placeholder="e.g. reining, cutting..."></div>
+          <div class="fgroup"><label>Promoter</label><input id="fpr" type="text" placeholder="Promoter name..."></div>
+        </div>
+        <div class="fgroup"><label>Website</label><input id="fwb" type="url" placeholder="https://..."></div>
+        <div class="fgroup"><label>Description</label><textarea id="fde" rows="3" placeholder="Event details..."></textarea></div>
+        <div class="factions">
+          <button class="btn-save" onclick="save()">Save Event</button>
+          <button class="btn-cancel" onclick="closeF()">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="elist" id="el"></div>
+    <div class="empty" id="em" style="display:none">No events found</div>
+  </div>
+</div>
+
 <script>
-const API = '';
-var allEvents = [];
-var allArenas = [];
-var sortField = 'start_date';
-var sortDir = 'asc';
-var searchTimer;
+function tog(){document.getElementById('dw').classList.toggle('on');document.getElementById('dbg').classList.toggle('on')}
 
-// ── Init ──
-(async function boot() {
-    // Load arenas for dropdown
-    try { const r = await fetch(`/api/arenas?limit=200`); const d = await r.json(); allArenas = d.arenas || []; } catch(e) {}
-    populateArenaDropdown();
+var EV=[],AR=[],T;
+document.getElementById('si').oninput=function(){clearTimeout(T);T=setTimeout(render,300)};
 
-    // Load events
-    await loadEvents();
-
-    // Search debounce
-    document.getElementById('searchInput').addEventListener('input', () => {
-        clearTimeout(searchTimer);
-        searchTimer = setTimeout(renderTable, 300);
-    });
+(async function(){
+  try{var r=await fetch('/api/arenas?limit=200');var d=await r.json();AR=d.arenas||[]}catch(e){}
+  var sel=document.getElementById('far');
+  sel.innerHTML='<option value="">No arena</option>'+AR.map(function(a){return '<option value="'+a.id+'">'+E(a.name)+'</option>'}).join('');
+  await loadEv();
 })();
 
-function toggleDrawer() {
-    document.getElementById('drawer').classList.toggle('open');
-    document.getElementById('drawerBg').classList.toggle('hidden');
+async function loadEv(){
+  try{var r=await fetch('/api/events?limit=500');var d=await r.json();EV=d.events||[]}catch(e){EV=[]}
+  renderStats();render();
 }
 
-function populateArenaDropdown() {
-    const sel = document.getElementById('fArena');
-    allArenas.forEach(a => {
-        const opt = document.createElement('option');
-        opt.value = a.id;
-        opt.textContent = `${a.name} — ${a.city || ''}${a.city && a.state ? ', ' : ''}${a.state || ''}`;
-        sel.appendChild(opt);
-    });
+function renderStats(){
+  var ok=EV.filter(function(e){return e.is_approved}).length;
+  var pend=EV.length-ok;
+  var up=EV.filter(function(e){return e.start_date>=new Date().toISOString().split('T')[0]}).length;
+  document.getElementById('stats').innerHTML=
+    sb(EV.length,'Total')+sb(ok,'Approved')+sb(pend,'Pending')+sb(up,'Upcoming');
+}
+function sb(v,l){return '<div class="sbox"><b>'+v+'</b><small>'+l+'</small></div>'}
+
+function render(){
+  var s=document.getElementById('si').value.toLowerCase().trim();
+  var f=EV.filter(function(e){
+    if(!s)return true;
+    return(e.title+' '+(e.arena_name||'')+' '+(e.discipline||'')+' '+(e.promoter||'')).toLowerCase().indexOf(s)!==-1;
+  });
+  var el=document.getElementById('el'),em=document.getElementById('em');
+  if(!f.length){el.innerHTML='';em.style.display='block';return}
+  em.style.display='none';
+  el.innerHTML=f.map(function(e){
+    var d=e.start_date?new Date(e.start_date+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'';
+    var ed=e.end_date?new Date(e.end_date+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'}):'';
+    return '<div class="ev"><h3>'+E(e.title)+'</h3>'+
+      '<div class="meta">'+d+(ed?' — '+ed:'')+(e.arena_name?' · '+E(e.arena_name):'')+'</div>'+
+      (e.discipline?'<div class="meta">'+E(e.discipline)+(e.promoter?' · '+E(e.promoter):'')+'</div>':'')+
+      '<span class="badge '+(e.is_approved?'badge-ok':'badge-pend')+'">'+(e.is_approved?'Approved':'Pending')+'</span>'+
+      '<div class="acts">'+
+        '<button onclick="editEv(\''+e.id+'\')">Edit</button>'+
+        (!e.is_approved?'<button onclick="approve(\''+e.id+'\')">Approve</button>':'')+
+        '<button class="del" onclick="delEv(\''+e.id+'\',\''+E(e.title).replace(/'/g,"\\'")+'\')">Delete</button>'+
+      '</div></div>';
+  }).join('');
 }
 
-// ── Load Events ──
-async function loadEvents() {
-    try {
-        const res = await fetch(`/api/events?limit=500`);
-        const data = await res.json();
-        allEvents = data.events || [];
-    } catch (err) {
-        console.error('Failed to load events:', err);
-        allEvents = [];
-    }
-    renderStats();
-    renderTable();
+function openF(){
+  document.getElementById('eid').value='';
+  document.getElementById('fh').textContent='New Event';
+  ['ft','fsd','fed','fdi','fpr','fwb','fde'].forEach(function(x){document.getElementById(x).value=''});
+  document.getElementById('far').value='';
+  document.getElementById('fty').value='';
+  document.getElementById('fp').classList.add('on');
+  document.getElementById('ft').focus();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function closeF(){document.getElementById('fp').classList.remove('on')}
+
+function editEv(id){
+  var e=EV.find(function(x){return x.id===id});if(!e)return;
+  document.getElementById('eid').value=e.id;
+  document.getElementById('fh').textContent='Edit Event';
+  document.getElementById('ft').value=e.title||'';
+  document.getElementById('far').value=e.arena_id||'';
+  document.getElementById('fsd').value=e.start_date?e.start_date.split('T')[0]:'';
+  document.getElementById('fed').value=e.end_date?e.end_date.split('T')[0]:'';
+  document.getElementById('fty').value=e.event_type||'';
+  document.getElementById('fdi').value=e.discipline||'';
+  document.getElementById('fpr').value=e.promoter||'';
+  document.getElementById('fwb').value=e.website||'';
+  document.getElementById('fde').value=e.description||'';
+  document.getElementById('fp').classList.add('on');
+  window.scrollTo({top:0,behavior:'smooth'});
 }
 
-// ── Stats ──
-function renderStats() {
-    const today = new Date().toISOString().split('T')[0];
-    document.getElementById('statTotal').textContent = allEvents.length;
-    document.getElementById('statApproved').textContent = allEvents.filter(e => e.is_approved).length;
-    document.getElementById('statPending').textContent = allEvents.filter(e => !e.is_approved).length;
-    document.getElementById('statUpcoming').textContent = allEvents.filter(e => e.start_date && e.start_date.split('T')[0] >= today).length;
-    document.getElementById('eventCountBadge').textContent = `${allEvents.length} events`;
+async function save(){
+  var id=document.getElementById('eid').value;
+  var title=document.getElementById('ft').value.trim();
+  var sd=document.getElementById('fsd').value;
+  if(!title){toast('Title required','err');return}
+  if(!sd){toast('Start date required','err');return}
+
+  var body={title:title,arena_id:document.getElementById('far').value||null,start_date:sd,
+    end_date:document.getElementById('fed').value||null,event_type:document.getElementById('fty').value||null,
+    discipline:document.getElementById('fdi').value||null,promoter:document.getElementById('fpr').value||null,
+    website:document.getElementById('fwb').value||null,description:document.getElementById('fde').value||null};
+
+  try{
+    var url=id?'/api/events?id='+id:'/api/events';
+    await fetch(url,{method:id?'PUT':'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    closeF();toast(id?'Event updated':'Event created','ok');await loadEv();
+  }catch(e){toast('Save failed','err')}
 }
 
-// ── Render Table ──
-function renderTable() {
-    const search = document.getElementById('searchInput').value.toLowerCase().trim();
-    const statusFilter = document.getElementById('filterStatus').value;
-
-    let filtered = allEvents.filter(e => {
-        if (statusFilter === 'approved' && !e.is_approved) return false;
-        if (statusFilter === 'pending' && e.is_approved) return false;
-        if (search) {
-            const hay = `${e.title} ${e.arena_name||''} ${e.discipline||''} ${e.promoter||''} ${e.event_type||''}`.toLowerCase();
-            if (!hay.includes(search)) return false;
-        }
-        return true;
-    });
-
-    // Sort
-    filtered.sort((a, b) => {
-        let va = a[sortField] || '';
-        let vb = b[sortField] || '';
-        if (typeof va === 'string') va = va.toLowerCase();
-        if (typeof vb === 'string') vb = vb.toLowerCase();
-        const cmp = va < vb ? -1 : va > vb ? 1 : 0;
-        return sortDir === 'asc' ? cmp : -cmp;
-    });
-
-    const tbody = document.getElementById('eventTableBody');
-
-    if (filtered.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" class="py-12 text-center text-cream-300/15 text-sm">No events match your filters.</td></tr>';
-        return;
-    }
-
-    tbody.innerHTML = filtered.map(e => {
-        const d = new Date(e.start_date);
-        const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-        const endStr = e.end_date ? ' — ' + new Date(e.end_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '';
-
-        return `<tr class="border-b border-gold-400/5 hover:bg-navy-600/40 transition-colors group">
-            <td class="py-3 px-4">
-                <div class="font-semibold text-cream-100 group-hover:text-gold-400 transition-colors">${esc(e.title)}</div>
-                ${e.promoter ? `<div class="text-[11px] text-cream-300/20 mt-0.5">${esc(e.promoter)}</div>` : ''}
-            </td>
-            <td class="py-3 px-4 hidden md:table-cell text-cream-300/40">
-                ${e.arena_name ? `<span>${esc(e.arena_name)}</span>` : '<span class="text-cream-300/15">—</span>'}
-                ${e.arena_city ? `<div class="text-[10px] text-cream-300/15">${esc(e.arena_city)}${e.arena_state ? ', ' + esc(e.arena_state) : ''}</div>` : ''}
-            </td>
-            <td class="py-3 px-4 hidden lg:table-cell text-cream-300/30">${e.discipline ? esc(cap(e.discipline)) : '<span class="text-cream-300/10">—</span>'}</td>
-            <td class="py-3 px-4 text-cream-300/40 whitespace-nowrap">
-                <div>${dateStr}</div>
-                ${endStr ? `<div class="text-[10px] text-cream-300/15">${endStr}</div>` : ''}
-            </td>
-            <td class="py-3 px-4 hidden sm:table-cell">
-                ${e.is_approved
-                    ? '<span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-sage-500/15 text-sage-400">Approved</span>'
-                    : '<span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-rust-500/15 text-rust-400">Pending</span>'
-                }
-            </td>
-            <td class="py-3 px-4 text-right whitespace-nowrap">
-                <div class="flex items-center justify-end gap-1">
-                    ${!e.is_approved ? `<button onclick="approveEvent('${e.id}')" title="Approve" class="w-7 h-7 rounded-lg bg-sage-500/10 hover:bg-sage-500/20 flex items-center justify-center text-sage-400 transition-colors">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/></svg>
-                    </button>` : ''}
-                    <button onclick="editEvent('${e.id}')" title="Edit" class="w-7 h-7 rounded-lg bg-gold-400/5 hover:bg-gold-400/15 flex items-center justify-center text-gold-400/40 hover:text-gold-400 transition-colors">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"/></svg>
-                    </button>
-                    <button onclick="deleteEvent('${e.id}','${esc(e.title)}')" title="Delete" class="w-7 h-7 rounded-lg bg-rust-500/5 hover:bg-rust-500/15 flex items-center justify-center text-rust-400/30 hover:text-rust-400 transition-colors">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"/></svg>
-                    </button>
-                </div>
-            </td>
-        </tr>`;
-    }).join('');
+async function approve(id){
+  try{await fetch('/api/events?id='+id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({is_approved:true,status:'approved'})});toast('Approved','ok');await loadEv()}catch(e){}
 }
 
-// ── Sort ──
-function sortBy(field) {
-    if (sortField === field) {
-        sortDir = sortDir === 'asc' ? 'desc' : 'asc';
-    } else {
-        sortField = field;
-        sortDir = 'asc';
-    }
-    // Update sort indicators
-    document.querySelectorAll('.sort-btn').forEach(b => { b.classList.remove('asc','desc'); });
-    const activeBtn = document.querySelector(`.sort-btn[onclick="sortBy('${field}')"]`);
-    if (activeBtn) activeBtn.classList.add(sortDir);
-    renderTable();
+async function delEv(id,title){
+  if(!confirm('Delete "'+title+'"?'))return;
+  try{await fetch('/api/events?id='+id,{method:'DELETE'});toast('Deleted','ok');await loadEv()}catch(e){toast('Delete failed','err')}
 }
 
-// ── Form: Open / Close ──
-function openForm() {
-    document.getElementById('editId').value = '';
-    document.getElementById('formTitle').textContent = 'Add Event';
-    clearForm();
-    document.getElementById('formPanel').classList.remove('hidden');
-    document.getElementById('formError').classList.add('hidden');
-    document.getElementById('fTitle').focus();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+function toast(msg,type){
+  var el=document.createElement('div');
+  el.className='toast toast-'+(type||'ok');el.textContent=msg;
+  document.getElementById('tw').appendChild(el);
+  setTimeout(function(){el.remove()},3000);
 }
 
-function closeForm() {
-    document.getElementById('formPanel').classList.add('hidden');
-}
-
-function clearForm() {
-    ['fTitle','fArena','fDiscipline','fStart','fEnd','fType','fFee','fPromoter','fWebsite','fFlyer','fDesc'].forEach(id => {
-        document.getElementById(id).value = '';
-    });
-}
-
-// ── Form: Edit (populate from event) ──
-function editEvent(id) {
-    const ev = allEvents.find(e => e.id === id);
-    if (!ev) return;
-
-    document.getElementById('editId').value = ev.id;
-    document.getElementById('formTitle').textContent = 'Edit Event';
-    document.getElementById('fTitle').value = ev.title || '';
-    document.getElementById('fArena').value = ev.arena_id || '';
-    document.getElementById('fDiscipline').value = ev.discipline || '';
-    document.getElementById('fStart').value = ev.start_date ? ev.start_date.split('T')[0] : '';
-    document.getElementById('fEnd').value = ev.end_date ? ev.end_date.split('T')[0] : '';
-    document.getElementById('fType').value = ev.event_type || '';
-    document.getElementById('fFee').value = ev.entry_fee || '';
-    document.getElementById('fPromoter').value = ev.promoter || '';
-    document.getElementById('fWebsite').value = ev.website || '';
-    document.getElementById('fFlyer').value = ev.flyer_url || '';
-    document.getElementById('fDesc').value = ev.description || '';
-
-    document.getElementById('formPanel').classList.remove('hidden');
-    document.getElementById('formError').classList.add('hidden');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-// ── Form: Save (POST or PUT) ──
-async function saveEvent() {
-    const id = document.getElementById('editId').value;
-    const title = document.getElementById('fTitle').value.trim();
-    const startDate = document.getElementById('fStart').value;
-
-    // Validate
-    if (!title) { showFormError('Event title is required.'); return; }
-    if (!startDate) { showFormError('Start date is required.'); return; }
-
-    const body = {
-        title: title,
-        arena_id: document.getElementById('fArena').value || null,
-        discipline: document.getElementById('fDiscipline').value || null,
-        start_date: startDate,
-        end_date: document.getElementById('fEnd').value || null,
-        event_type: document.getElementById('fType').value || null,
-        entry_fee: parseFloat(document.getElementById('fFee').value) || null,
-        promoter: document.getElementById('fPromoter').value || null,
-        website: document.getElementById('fWebsite').value || null,
-        flyer_url: document.getElementById('fFlyer').value || null,
-        description: document.getElementById('fDesc').value || null
-    };
-
-    try {
-        const url = id ? `/api/events?id=${id}` : `/api/events`;
-        const method = id ? 'PUT' : 'POST';
-
-        const res = await fetch(url, {
-            method,
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(body)
-        });
-
-        if (!res.ok) {
-            const err = await res.json();
-            showFormError(err.error || 'Save failed.');
-            return;
-        }
-
-        closeForm();
-        showToast(id ? 'Event updated' : 'Event created', 'success');
-        await loadEvents();
-
-    } catch (err) {
-        console.error('Save event error:', err);
-        showFormError('Network error. Please try again.');
-    }
-}
-
-// ── Approve ──
-async function approveEvent(id) {
-    try {
-        const res = await fetch(`/api/events?id=${id}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ is_approved: true, status: 'approved' })
-        });
-        if (res.ok) {
-            showToast('Event approved', 'success');
-            await loadEvents();
-        }
-    } catch (err) {
-        console.error('Approve error:', err);
-    }
-}
-
-// ── Delete ──
-async function deleteEvent(id, title) {
-    if (!confirm(`Delete "${title}"?\n\nThis action cannot be undone.`)) return;
-
-    try {
-        const res = await fetch(`/api/events?id=${id}`, { method: 'DELETE' });
-        if (res.ok) {
-            showToast('Event deleted', 'warning');
-            await loadEvents();
-        } else {
-            const err = await res.json();
-            showToast(err.error || 'Delete failed', 'error');
-        }
-    } catch (err) {
-        console.error('Delete error:', err);
-        showToast('Network error', 'error');
-    }
-}
-
-// ── Form Error ──
-function showFormError(msg) {
-    const el = document.getElementById('formError');
-    el.textContent = msg;
-    el.classList.remove('hidden');
-    setTimeout(() => el.classList.add('hidden'), 5000);
-}
-
-// ── Toast Notifications ──
-function showToast(message, type = 'success') {
-    const container = document.getElementById('toastContainer');
-    const colors = {
-        success: 'bg-sage-500 text-white',
-        warning: 'bg-gold-400 text-navy-500',
-        error: 'bg-rust-500 text-white'
-    };
-    const icons = {
-        success: '<path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/>',
-        warning: '<path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"/>',
-        error: '<path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/>'
-    };
-
-    const toast = document.createElement('div');
-    toast.className = `toast-enter flex items-center gap-2 px-4 py-2.5 rounded-lg shadow-lg text-xs font-bold ${colors[type] || colors.success}`;
-    toast.innerHTML = `<svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">${icons[type] || icons.success}</svg>${esc(message)}`;
-
-    container.appendChild(toast);
-
-    setTimeout(() => {
-        toast.classList.remove('toast-enter');
-        toast.classList.add('toast-exit');
-        setTimeout(() => toast.remove(), 250);
-    }, 3000);
-}
-
-// ── Helpers ──
-function esc(s) { return s ? String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;') : ''; }
-function cap(s) { return s ? s.split(/[\s-]+/).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') : ''; }
+function E(s){return s?String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'):''}
 </script>
-
 </body>
 </html>

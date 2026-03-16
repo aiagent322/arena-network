@@ -1,487 +1,209 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>News Publisher — Arena Network Dashboard</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>News Publisher — Arena Network</title>
+<link href="https://fonts.googleapis.com/css2?family=Bitter:wght@600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--navy:#0B1D3A;--navy2:#091730;--navy3:#071225;--gold:#C8993C;--cream:#FAF6EF;--rust:#9B4D2B;--sage:#5A7247;--r:10px}
+body{font-family:'DM Sans',system-ui,sans-serif;background:var(--navy2);color:var(--cream);-webkit-text-size-adjust:100%}
+h1,h2,h3{font-family:'Bitter',Georgia,serif}
+a{text-decoration:none;color:inherit}
+.side{display:none}.drawer-bg{display:none;position:fixed;inset:0;background:rgba(7,18,37,.6);z-index:40}.drawer-bg.on{display:block}
+.drawer{position:fixed;top:0;left:0;bottom:0;width:260px;background:var(--navy3);z-index:50;transform:translateX(-100%);transition:transform .3s}.drawer.on{transform:translateX(0)}
+.drawer-hdr{height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;border-bottom:1px solid rgba(200,153,60,.08)}
+.drawer-hdr span{font-family:'Bitter',serif;font-weight:700;color:var(--gold);font-size:14px}
+.drawer-x{width:36px;height:36px;border-radius:8px;background:var(--navy);display:flex;align-items:center;justify-content:center;border:0;cursor:pointer;color:rgba(250,246,239,.3)}
+.drawer-x svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.5}
+.drawer nav{padding:12px}.drawer nav a{display:block;padding:12px;border-radius:8px;font-size:13px;font-weight:600;color:rgba(250,246,239,.35);margin-bottom:2px}
+.drawer nav a.on{color:var(--gold);background:rgba(200,153,60,.08)}
+.topbar{height:56px;background:var(--navy);border-bottom:1px solid rgba(200,153,60,.08);display:flex;align-items:center;justify-content:space-between;padding:0 16px}
+.topbar h1{font-size:16px;font-weight:700}
+.hbtn{width:48px;height:48px;display:flex;align-items:center;justify-content:center;background:var(--navy2);border-radius:8px;border:0;cursor:pointer}
+.hbtn svg{width:20px;height:20px;stroke:var(--gold);fill:none;stroke-width:2}
+.wrap{padding:16px}
+.srow{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+.sbox{background:var(--navy);border:1px solid rgba(200,153,60,.08);border-radius:var(--r);padding:12px;text-align:center}
+.sbox b{display:block;font-family:'Bitter',serif;font-weight:800;font-size:18px;color:var(--gold);line-height:1}
+.sbox small{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:rgba(250,246,239,.2);margin-top:2px;display:block}
+.abar{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+.ain{width:100%;padding:12px;font-size:14px;background:var(--navy);border:1px solid rgba(200,153,60,.08);border-radius:var(--r);color:var(--cream);font-family:inherit}
+.ain:focus{outline:0;border-color:rgba(200,153,60,.25)}.ain::placeholder{color:rgba(250,246,239,.15)}
+.abtn{padding:14px;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;background:var(--gold);color:var(--navy);border:0;border-radius:var(--r);cursor:pointer;font-family:inherit;min-height:48px;white-space:nowrap}
+.fpanel{display:none;background:var(--navy);border:1px solid rgba(200,153,60,.1);border-radius:var(--r);margin-bottom:16px;overflow:hidden}.fpanel.on{display:block}
+.fpanel-hdr{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid rgba(200,153,60,.08)}
+.fpanel-hdr h2{font-size:14px;font-weight:700}
+.fpanel-body{padding:16px}
+.fgroup{margin-bottom:12px}
+.fgroup label{display:block;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:rgba(250,246,239,.25);margin-bottom:4px}
+.fgroup input,.fgroup select,.fgroup textarea{width:100%;padding:12px;background:var(--navy2);border:1px solid rgba(200,153,60,.08);border-radius:8px;color:var(--cream);font-size:14px;font-family:inherit;-webkit-appearance:none}
+.fgroup input:focus,.fgroup select:focus,.fgroup textarea:focus{outline:0;border-color:rgba(200,153,60,.25)}
+.frow2{display:flex;flex-direction:column;gap:12px}
+.factions{display:flex;flex-wrap:wrap;gap:8px;padding-top:12px;border-top:1px solid rgba(200,153,60,.08)}
+.factions button{padding:12px 20px;border-radius:8px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;border:0;cursor:pointer;font-family:inherit;min-height:48px}
+.btn-pub{background:var(--sage);color:#FFF}
+.btn-draft{background:0;border:1px solid rgba(200,153,60,.15);color:rgba(200,153,60,.4)}
+.btn-cancel{background:0;border:1px solid rgba(200,153,60,.08);color:rgba(250,246,239,.2)}
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config={theme:{extend:{colors:{navy:{50:'#E8ECF2',100:'#C5CEE0',400:'#3C5A8A',500:'#0B1D3A',600:'#091730',700:'#071225'},gold:{50:'#FDF8EE',100:'#F9EDCC',300:'#E8C46D',400:'#C8993C',500:'#B5882F',600:'#9A7226'},cream:{50:'#FEFDFB',100:'#FAF6EF',200:'#F2EBE0',300:'#E8DFD0'},rust:{400:'#B85A3A',500:'#9B4D2B',600:'#7F3E22'},sage:{400:'#6D8A56',500:'#5A7247',600:'#4A5E3B'}},fontFamily:{display:['Bitter','Georgia','serif'],body:['DM Sans','system-ui','sans-serif']}}}}
-    </script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bitter:wght@500;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+.nlist{display:flex;flex-direction:column;gap:8px}
+.nc{background:var(--navy);border:1px solid rgba(200,153,60,.08);border-radius:var(--r);padding:14px}
+.nc h3{font-size:14px;font-weight:700;margin-bottom:4px}
+.nc .meta{font-size:11px;color:rgba(250,246,239,.25);margin-bottom:2px}
+.nc .preview{font-size:12px;color:rgba(250,246,239,.2);line-height:1.5;margin-bottom:8px}
+.nc .acts{display:flex;flex-wrap:wrap;gap:4px;padding-top:8px;border-top:1px solid rgba(200,153,60,.05)}
+.nc .acts button{padding:8px 14px;border-radius:6px;font-size:10px;font-weight:700;text-transform:uppercase;border:0;cursor:pointer;font-family:inherit;min-height:40px;background:rgba(200,153,60,.05);color:rgba(200,153,60,.4)}
+.nc .acts .del{color:rgba(155,77,43,.5);margin-left:auto}
+.badge{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;text-transform:uppercase}
+.badge-pub{background:rgba(90,114,71,.12);color:var(--sage)}.badge-draft{background:rgba(250,246,239,.04);color:rgba(250,246,239,.2)}
+.toast-wrap{position:fixed;top:64px;right:16px;z-index:60}
+.toast{padding:10px 16px;border-radius:8px;font-size:12px;font-weight:700;margin-bottom:6px;animation:tin .2s ease-out}
+.toast-ok{background:var(--sage);color:#FFF}.toast-err{background:var(--rust);color:#FFF}
+@keyframes tin{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+.empty{text-align:center;padding:40px 16px;color:rgba(250,246,239,.15);font-size:13px;display:none}
 
-    <style>
-        body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;opacity:0.02;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
-        @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}.fade-in{animation:fadeIn .3s ease-out forwards}
-        @keyframes toastIn{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:translateY(0)}}
-        @keyframes toastOut{from{opacity:1}to{opacity:0;transform:translateY(-12px)}}
-        .toast-in{animation:toastIn .25s ease-out forwards}.toast-out{animation:toastOut .2s ease-in forwards}
-        .mobile-drawer{transform:translateX(-100%);transition:transform .3s ease}.mobile-drawer.open{transform:translateX(0)}
-        textarea,input,select{font-family:'DM Sans',system-ui,sans-serif}
-        ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:#091730}::-webkit-scrollbar-thumb{background:#C8993C;border-radius:3px}
-    </style>
+@media(min-width:640px){.abar{flex-direction:row;align-items:flex-end}.abar>*:first-child{flex:1}.abtn{width:auto;padding:12px 24px}.frow2{flex-direction:row}.frow2>*{flex:1}}
+@media(min-width:1024px){
+  .hbtn{display:none}
+  .side{display:flex;flex-direction:column;width:220px;flex-shrink:0;background:var(--navy3);border-right:1px solid rgba(200,153,60,.08);position:fixed;top:0;bottom:0;left:0;z-index:30}
+  .side-hdr{height:56px;display:flex;align-items:center;padding:0 16px;border-bottom:1px solid rgba(200,153,60,.08)}
+  .side-hdr a{display:flex;align-items:center;gap:8px}.side-hdr .si{width:28px;height:28px;background:var(--gold);border-radius:7px;display:flex;align-items:center;justify-content:center}
+  .side-hdr .si svg{width:14px;height:14px;stroke:var(--navy);fill:none;stroke-width:2.2}
+  .side-hdr span{font-family:'Bitter',serif;font-weight:700;color:var(--gold);font-size:13px}
+  .side nav{padding:12px;flex:1}.side nav a{display:block;padding:10px 12px;border-radius:8px;font-size:13px;font-weight:600;color:rgba(250,246,239,.3);margin-bottom:2px}
+  .side nav a:hover{color:var(--gold);background:rgba(200,153,60,.05)}.side nav a.on{color:var(--gold);background:rgba(200,153,60,.08)}
+  .side-ft{padding:12px;border-top:1px solid rgba(200,153,60,.08)}.side-ft a{font-size:11px;color:rgba(250,246,239,.2);padding:8px}
+  .page{margin-left:220px}
+}
+</style>
 </head>
+<body>
+<aside class="side"><div class="side-hdr"><a href="../index.html"><div class="si"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18"/></svg></div><span>ARENA NET</span></a></div><nav><a href="dashboard.html">Overview</a><a href="events.html">Events</a><a href="news.html" class="on">News</a><a href="analytics.html">Analytics</a></nav><div class="side-ft"><a href="../index.html">← Back to Site</a></div></aside>
+<div class="drawer-bg" id="dbg" onclick="tog()"></div>
+<div class="drawer" id="dw"><div class="drawer-hdr"><span>NEWS</span><button class="drawer-x" onclick="tog()"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M6 18 18 6M6 6l12 12"/></svg></button></div><nav><a href="dashboard.html">Overview</a><a href="events.html">Events</a><a href="news.html" class="on">News</a><a href="analytics.html">Analytics</a></nav></div>
 
-<body class="bg-navy-600 text-cream-100 font-body min-h-screen">
+<div class="page">
+<div class="topbar"><div style="display:flex;align-items:center;gap:10px"><button class="hbtn" onclick="tog()"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/></svg></button><h1>News Publisher</h1></div></div>
+<div class="wrap">
+  <div class="toast-wrap" id="tw"></div>
+  <div class="srow" id="stats"></div>
+  <div class="abar">
+    <input id="si" type="text" class="ain" placeholder="Search articles...">
+    <button class="abtn" onclick="openF()">+ New Article</button>
+  </div>
 
-<div class="flex min-h-screen">
-
-    <!-- ═══════════ SIDEBAR (desktop) ═══════════ -->
-    <aside class="hidden lg:flex flex-col w-60 flex-shrink-0 bg-navy-700 border-r border-gold-400/10">
-        <div class="h-16 flex items-center px-5 border-b border-gold-400/10">
-            <a href="../index.html" class="flex items-center gap-2">
-                <div class="w-8 h-8 rounded-lg bg-gold-400 flex items-center justify-center">
-                    <svg class="w-4 h-4 text-navy-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21"/></svg>
-                </div>
-                <span class="font-display font-700 text-gold-400 text-sm tracking-wide">ARENA NET</span>
-            </a>
-        </div>
-        <nav class="flex-1 py-4 px-3 space-y-0.5 overflow-y-auto">
-            <a href="dashboard.html#profile" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold text-cream-300/40 hover:text-gold-400 hover:bg-gold-400/5 transition-all">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21"/></svg>
-                Arena Profile</a>
-            <a href="events.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold text-cream-300/40 hover:text-gold-400 hover:bg-gold-400/5 transition-all">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"/></svg>
-                Events</a>
-            <a href="news.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold text-gold-400 bg-gold-400/10 transition-all">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 0 1-2.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 0 0 2.25 2.25h13.5"/></svg>
-                News Publisher</a>
-            <a href="dashboard.html#vendors" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold text-cream-300/40 hover:text-gold-400 hover:bg-gold-400/5 transition-all">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64"/></svg>
-                Vendors</a>
-            <a href="dashboard.html#sponsors" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold text-cream-300/40 hover:text-gold-400 hover:bg-gold-400/5 transition-all">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z"/></svg>
-                Sponsors</a>
-            <a href="dashboard.html#analytics" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold text-cream-300/40 hover:text-gold-400 hover:bg-gold-400/5 transition-all">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z"/></svg>
-                Analytics</a>
-        </nav>
-        <div class="p-3 border-t border-gold-400/10">
-            <a href="../index.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-cream-300/30 hover:text-gold-400 hover:bg-gold-400/5 transition-all text-xs font-semibold">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"/></svg>
-                Back to Site</a>
-        </div>
-    </aside>
-
-    <!-- ── MOBILE DRAWER ── -->
-    <div id="drawerBg" class="fixed inset-0 bg-navy-700/60 z-40 hidden lg:hidden" onclick="toggleDrawer()"></div>
-    <aside id="drawer" class="mobile-drawer fixed inset-y-0 left-0 w-64 bg-navy-700 z-50 lg:hidden flex flex-col">
-        <div class="h-16 flex items-center justify-between px-5 border-b border-gold-400/10">
-            <span class="font-display font-700 text-gold-400 text-sm">NEWS</span>
-            <button onclick="toggleDrawer()" class="w-8 h-8 rounded-lg bg-navy-500 flex items-center justify-center text-cream-300/40 hover:text-gold-400">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
-            </button>
-        </div>
-        <nav class="flex-1 py-4 px-3 space-y-0.5 overflow-y-auto">
-            <a href="dashboard.html#profile" class="block px-3 py-2.5 rounded-lg text-sm font-semibold text-cream-300/40">Arena Profile</a>
-            <a href="events.html" class="block px-3 py-2.5 rounded-lg text-sm font-semibold text-cream-300/40">Events</a>
-            <a href="news.html" class="block px-3 py-2.5 rounded-lg text-sm font-semibold text-gold-400 bg-gold-400/10">News Publisher</a>
-            <a href="dashboard.html#vendors" class="block px-3 py-2.5 rounded-lg text-sm font-semibold text-cream-300/40">Vendors</a>
-            <a href="dashboard.html#sponsors" class="block px-3 py-2.5 rounded-lg text-sm font-semibold text-cream-300/40">Sponsors</a>
-            <a href="dashboard.html#analytics" class="block px-3 py-2.5 rounded-lg text-sm font-semibold text-cream-300/40">Analytics</a>
-        </nav>
-    </aside>
-
-    <!-- ═══════════ MAIN ═══════════ -->
-    <div class="flex-1 flex flex-col min-w-0">
-
-        <!-- Top bar -->
-        <header class="h-16 bg-navy-500 border-b border-gold-400/10 flex items-center justify-between px-4 sm:px-6 flex-shrink-0">
-            <div class="flex items-center gap-3">
-                <button onclick="toggleDrawer()" class="lg:hidden w-9 h-9 rounded-lg bg-navy-600 flex items-center justify-center text-gold-400">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/></svg>
-                </button>
-                <h1 class="font-display font-700 text-lg text-cream-100">News Publisher</h1>
-            </div>
-            <span id="articleCount" class="px-2.5 py-0.5 rounded-full bg-gold-400/10 text-gold-400 text-[10px] font-bold uppercase tracking-wider"></span>
-        </header>
-
-        <!-- Content -->
-        <main class="flex-1 overflow-y-auto p-4 sm:p-6">
-
-            <!-- Toast container -->
-            <div id="toasts" class="fixed top-20 right-4 sm:right-6 z-50 space-y-2"></div>
-
-            <!-- Stats -->
-            <div class="grid grid-cols-3 gap-2 sm:gap-3 mb-6">
-                <div class="bg-navy-500 rounded-xl border border-gold-400/10 p-4 text-center">
-                    <div id="statAll" class="font-display font-800 text-2xl text-gold-400 leading-none">—</div>
-                    <div class="text-[10px] font-semibold uppercase tracking-wider text-cream-300/25 mt-1">Total</div>
-                </div>
-                <div class="bg-navy-500 rounded-xl border border-gold-400/10 p-4 text-center">
-                    <div id="statPub" class="font-display font-800 text-2xl text-sage-400 leading-none">—</div>
-                    <div class="text-[10px] font-semibold uppercase tracking-wider text-cream-300/25 mt-1">Published</div>
-                </div>
-                <div class="bg-navy-500 rounded-xl border border-gold-400/10 p-4 text-center">
-                    <div id="statDraft" class="font-display font-800 text-2xl text-cream-300/40 leading-none">—</div>
-                    <div class="text-[10px] font-semibold uppercase tracking-wider text-cream-300/25 mt-1">Drafts</div>
-                </div>
-            </div>
-
-            <!-- Action bar -->
-            <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 mb-5">
-                <div class="flex-1 relative">
-                    <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-cream-300/20" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-                    <input id="searchBox" type="text" placeholder="Search articles..." class="w-full pl-10 pr-4 py-2.5 bg-navy-500 border border-gold-400/10 rounded-lg text-sm text-cream-100 placeholder:text-cream-300/15 focus:outline-none focus:border-gold-400/30 transition-colors">
-                </div>
-                <div class="flex gap-2">
-                    <select id="filterStatus" onchange="renderList()" class="py-2.5 px-3 bg-navy-500 border border-gold-400/10 rounded-lg text-sm text-cream-100 focus:outline-none focus:border-gold-400/30 appearance-none pr-8" style="background-image:url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%228%22%3E%3Cpath d=%221 1l5 5 5-5%22 stroke=%22%23C8993C%22 stroke-width=%221.5%22 fill=%22none%22/%3E%3C/svg%3E');background-repeat:no-repeat;background-position:right 10px center">
-                        <option value="">All</option>
-                        <option value="published">Published</option>
-                        <option value="draft">Drafts</option>
-                    </select>
-                    <button onclick="openForm()" class="bg-gold-400 hover:bg-gold-500 text-navy-500 font-bold text-xs px-5 py-2.5 rounded-lg uppercase tracking-wider transition-colors whitespace-nowrap flex items-center gap-1.5">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
-                        New Article
-                    </button>
-                </div>
-            </div>
-
-            <!-- ═══════════ EDITOR FORM ═══════════ -->
-            <div id="formPanel" class="hidden mb-6 bg-navy-500 rounded-xl border border-gold-400/15 overflow-hidden fade-in">
-                <div class="flex items-center justify-between px-4 sm:px-5 py-3 border-b border-gold-400/10">
-                    <h2 id="formTitle" class="font-display font-700 text-sm text-cream-100">New Article</h2>
-                    <button onclick="closeForm()" class="w-7 h-7 rounded-lg bg-navy-600 flex items-center justify-center text-cream-300/30 hover:text-gold-400 transition-colors">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
-                    </button>
-                </div>
-                <div class="p-4 sm:p-5">
-                    <input type="hidden" id="editId">
-
-                    <!-- Title -->
-                    <div class="mb-3">
-                        <label class="text-[10px] font-bold uppercase tracking-wider text-cream-300/30 mb-1 block">Title <span class="text-rust-400">*</span></label>
-                        <input id="fTitle" type="text" placeholder="Article headline..." class="w-full py-2.5 px-3 bg-navy-600 border border-gold-400/10 rounded-lg text-sm text-cream-100 placeholder:text-cream-300/15 focus:outline-none focus:border-gold-400/40 transition-colors">
-                    </div>
-
-                    <!-- Arena + Date row -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
-                        <div>
-                            <label class="text-[10px] font-bold uppercase tracking-wider text-cream-300/30 mb-1 block">Arena</label>
-                            <select id="fArena" class="w-full py-2.5 px-3 bg-navy-600 border border-gold-400/10 rounded-lg text-sm text-cream-100 focus:outline-none focus:border-gold-400/40 appearance-none transition-colors" style="background-image:url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%228%22%3E%3Cpath d=%221 1l5 5 5-5%22 stroke=%22%23C8993C%22 stroke-width=%221.5%22 fill=%22none%22/%3E%3C/svg%3E');background-repeat:no-repeat;background-position:right 10px center">
-                                <option value="">Network-wide (no arena)</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="text-[10px] font-bold uppercase tracking-wider text-cream-300/30 mb-1 block">Publish Date</label>
-                            <input id="fDate" type="date" class="w-full py-2.5 px-3 bg-navy-600 border border-gold-400/10 rounded-lg text-sm text-cream-100 focus:outline-none focus:border-gold-400/40 transition-colors">
-                        </div>
-                    </div>
-
-                    <!-- Body -->
-                    <div class="mb-3">
-                        <label class="text-[10px] font-bold uppercase tracking-wider text-cream-300/30 mb-1 block">Body <span class="text-rust-400">*</span></label>
-                        <textarea id="fBody" rows="8" placeholder="Write your article..." class="w-full py-2.5 px-3 bg-navy-600 border border-gold-400/10 rounded-lg text-sm text-cream-100 placeholder:text-cream-300/15 focus:outline-none focus:border-gold-400/40 resize-y transition-colors leading-relaxed"></textarea>
-                        <div class="flex justify-between mt-1">
-                            <span id="charCount" class="text-[10px] text-cream-300/15">0 characters</span>
-                            <span class="text-[10px] text-cream-300/15">Plain text — paragraphs separated by blank lines</span>
-                        </div>
-                    </div>
-
-                    <!-- Actions -->
-                    <div class="flex flex-wrap items-center gap-2 pt-4 border-t border-gold-400/10">
-                        <button onclick="saveArticle(true)" class="bg-sage-500 hover:bg-sage-600 text-white font-bold text-xs px-5 py-2.5 rounded-lg uppercase tracking-wider transition-colors flex items-center gap-1.5">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/></svg>
-                            Publish
-                        </button>
-                        <button onclick="saveArticle(false)" class="border border-gold-400/20 text-gold-400/60 hover:text-gold-400 hover:border-gold-400/40 bg-transparent font-bold text-xs px-5 py-2.5 rounded-lg uppercase tracking-wider transition-colors">
-                            Save Draft
-                        </button>
-                        <button onclick="closeForm()" class="border border-gold-400/10 text-cream-300/20 hover:text-cream-300/40 bg-transparent font-bold text-xs px-4 py-2.5 rounded-lg uppercase tracking-wider transition-colors">
-                            Cancel
-                        </button>
-                        <div id="formError" class="hidden text-xs font-semibold text-rust-400 ml-auto"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ═══════════ ARTICLE LIST ═══════════ -->
-            <div id="articleList" class="space-y-3"></div>
-
-            <!-- Empty state -->
-            <div id="emptyState" class="hidden text-center py-14">
-                <div class="w-14 h-14 mx-auto mb-3 rounded-full bg-navy-500 flex items-center justify-center">
-                    <svg class="w-7 h-7 text-cream-300/10" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 0 1-2.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 0 0 2.25 2.25h13.5"/></svg>
-                </div>
-                <h3 class="font-display font-700 text-sm text-cream-300/30 mb-1">No articles yet</h3>
-                <p class="text-xs text-cream-300/15 mb-4">Create your first news article to get started.</p>
-                <button onclick="openForm()" class="bg-gold-400 hover:bg-gold-500 text-navy-500 font-bold text-xs px-5 py-2.5 rounded-lg uppercase tracking-wider transition-colors">New Article</button>
-            </div>
-
-        </main>
+  <div class="fpanel" id="fp">
+    <div class="fpanel-hdr"><h2 id="fh">New Article</h2><button class="drawer-x" onclick="closeF()"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M6 18 18 6M6 6l12 12"/></svg></button></div>
+    <div class="fpanel-body">
+      <input type="hidden" id="nid">
+      <div class="fgroup"><label>Title *</label><input id="nt" type="text" placeholder="Article headline..."></div>
+      <div class="frow2">
+        <div class="fgroup"><label>Arena</label><select id="nar"></select></div>
+        <div class="fgroup"><label>Publish Date</label><input id="ndt" type="date"></div>
+      </div>
+      <div class="fgroup"><label>Body *</label><textarea id="nb" rows="8" placeholder="Write your article..."></textarea></div>
+      <div class="factions">
+        <button class="btn-pub" onclick="saveN(true)">Publish</button>
+        <button class="btn-draft" onclick="saveN(false)">Save Draft</button>
+        <button class="btn-cancel" onclick="closeF()">Cancel</button>
+      </div>
     </div>
+  </div>
+
+  <div class="nlist" id="nl"></div>
+  <div class="empty" id="em">No articles yet</div>
+</div>
 </div>
 
-<!-- ═══════════ JAVASCRIPT ═══════════ -->
 <script>
-var API = '';
-var allArticles = [];
-var allArenas = [];
-var searchTimer;
+function tog(){document.getElementById('dw').classList.toggle('on');document.getElementById('dbg').classList.toggle('on')}
+var NW=[],AR=[],T;
+document.getElementById('si').oninput=function(){clearTimeout(T);T=setTimeout(render,300)};
 
-// ── Boot ──
-(async function init() {
-    try { var r = await fetch('/api/arenas?limit=200'); var d = await r.json(); allArenas = d.arenas||[]; } catch(e){}
-    populateArenas();
-    await loadArticles();
-    document.getElementById('searchBox').addEventListener('input', function(){ clearTimeout(searchTimer); searchTimer = setTimeout(renderList, 300); });
-    document.getElementById('fBody').addEventListener('input', function(){ document.getElementById('charCount').textContent = this.value.length + ' characters'; });
+(async function(){
+  try{var r=await fetch('/api/arenas?limit=200');var d=await r.json();AR=d.arenas||[]}catch(e){}
+  document.getElementById('nar').innerHTML='<option value="">Network-wide</option>'+AR.map(function(a){return '<option value="'+a.id+'">'+E(a.name)+'</option>'}).join('');
+  await loadN();
 })();
 
-function toggleDrawer() {
-    document.getElementById('drawer').classList.toggle('open');
-    document.getElementById('drawerBg').classList.toggle('hidden');
+async function loadN(){
+  try{var r=await fetch('/api/news?limit=200');var d=await r.json();NW=d.news||[]}catch(e){NW=[]}
+  renderStats();render();
+}
+function renderStats(){
+  var pub=NW.filter(function(n){return n.is_published}).length;
+  document.getElementById('stats').innerHTML=sb(NW.length,'Total')+sb(pub,'Published')+sb(NW.length-pub,'Drafts');
+}
+function sb(v,l){return '<div class="sbox"><b>'+v+'</b><small>'+l+'</small></div>'}
+
+function render(){
+  var s=document.getElementById('si').value.toLowerCase().trim();
+  var f=NW.filter(function(n){return !s||(n.title+' '+(n.body||'')+' '+(n.arena_name||'')).toLowerCase().indexOf(s)!==-1});
+  var el=document.getElementById('nl'),em=document.getElementById('em');
+  if(!f.length&&!NW.length){el.innerHTML='';em.style.display='block';return}
+  em.style.display='none';
+  if(!f.length){el.innerHTML='<div class="empty" style="display:block">No matches</div>';return}
+  el.innerHTML=f.map(function(n){
+    var d=n.publish_date?new Date(n.publish_date+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'';
+    var prev=(n.body||'').substring(0,100);if((n.body||'').length>100)prev+='...';
+    return '<div class="nc"><h3>'+E(n.title)+'</h3>'+
+      '<div class="meta"><span class="badge '+(n.is_published?'badge-pub':'badge-draft')+'">'+(n.is_published?'Published':'Draft')+'</span> '+d+(n.arena_name?' · '+E(n.arena_name):'')+'</div>'+
+      (prev?'<div class="preview">'+E(prev)+'</div>':'')+
+      '<div class="acts">'+
+        '<button onclick="editN(\''+n.id+'\')">Edit</button>'+
+        '<button onclick="togPub(\''+n.id+'\','+(n.is_published?'false':'true')+')">'+(n.is_published?'Unpublish':'Publish')+'</button>'+
+        '<button class="del" onclick="delN(\''+n.id+'\',\''+E(n.title).replace(/'/g,"\\'")+'\')">Delete</button>'+
+      '</div></div>';
+  }).join('');
 }
 
-function populateArenas() {
-    var sel = document.getElementById('fArena');
-    allArenas.forEach(function(a) {
-        var opt = document.createElement('option');
-        opt.value = a.id;
-        opt.textContent = a.name + (a.city ? ' — '+a.city+(a.state?', '+a.state:'') : '');
-        sel.appendChild(opt);
-    });
+function openF(){
+  document.getElementById('nid').value='';document.getElementById('fh').textContent='New Article';
+  ['nt','nb'].forEach(function(x){document.getElementById(x).value=''});
+  document.getElementById('nar').value='';
+  document.getElementById('ndt').value=new Date().toISOString().split('T')[0];
+  document.getElementById('fp').classList.add('on');window.scrollTo({top:0,behavior:'smooth'});
+}
+function closeF(){document.getElementById('fp').classList.remove('on')}
+
+function editN(id){
+  var n=NW.find(function(x){return x.id===id});if(!n)return;
+  document.getElementById('nid').value=n.id;document.getElementById('fh').textContent='Edit Article';
+  document.getElementById('nt').value=n.title||'';
+  document.getElementById('nar').value=n.arena_id||'';
+  document.getElementById('ndt').value=n.publish_date?n.publish_date.split('T')[0]:'';
+  document.getElementById('nb').value=n.body||'';
+  document.getElementById('fp').classList.add('on');window.scrollTo({top:0,behavior:'smooth'});
 }
 
-// ── Load articles ──
-async function loadArticles() {
-    try {
-        var res = await fetch('/api/news?limit=200&published=');
-        // Pass empty published to get all (API treats undefined = no filter when explicitly empty)
-        var data = await res.json();
-        allArticles = data.news || [];
-    } catch(e) {
-        // Try without published filter
-        try {
-            var res2 = await fetch('/api/news?limit=200');
-            var data2 = await res2.json();
-            allArticles = data2.news || [];
-        } catch(e2) { allArticles = []; }
-    }
-    updateStats();
-    renderList();
+async function saveN(pub){
+  var id=document.getElementById('nid').value;
+  var title=document.getElementById('nt').value.trim();
+  var body=document.getElementById('nb').value.trim();
+  if(!title){toast('Title required','err');return}
+  if(!body){toast('Body required','err');return}
+  var payload={title:title,body:body,arena_id:document.getElementById('nar').value||null,
+    publish_date:document.getElementById('ndt').value||new Date().toISOString().split('T')[0],is_published:pub};
+  try{
+    var url=id?'/api/news?id='+id:'/api/news';
+    await fetch(url,{method:id?'PUT':'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    closeF();toast(id?'Updated':(pub?'Published':'Draft saved'),'ok');await loadN();
+  }catch(e){toast('Save failed','err')}
 }
 
-function updateStats() {
-    var pub = allArticles.filter(function(a){ return a.is_published; }).length;
-    document.getElementById('statAll').textContent = allArticles.length;
-    document.getElementById('statPub').textContent = pub;
-    document.getElementById('statDraft').textContent = allArticles.length - pub;
-    document.getElementById('articleCount').textContent = allArticles.length + ' articles';
+async function togPub(id,pub){
+  try{await fetch('/api/news?id='+id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({is_published:pub==='true'||pub===true})});
+    toast(pub?'Published':'Unpublished','ok');await loadN()}catch(e){}
 }
 
-// ── Render article list ──
-function renderList() {
-    var search = document.getElementById('searchBox').value.toLowerCase().trim();
-    var status = document.getElementById('filterStatus').value;
-
-    var filtered = allArticles.filter(function(a) {
-        if (status === 'published' && !a.is_published) return false;
-        if (status === 'draft' && a.is_published) return false;
-        if (search) {
-            var hay = (a.title+' '+(a.body||'')+' '+(a.arena_name||'')).toLowerCase();
-            if (hay.indexOf(search) === -1) return false;
-        }
-        return true;
-    });
-
-    var listEl = document.getElementById('articleList');
-    var emptyEl = document.getElementById('emptyState');
-
-    if (filtered.length === 0 && allArticles.length === 0) {
-        listEl.innerHTML = '';
-        emptyEl.classList.remove('hidden');
-        return;
-    }
-    emptyEl.classList.add('hidden');
-
-    if (filtered.length === 0) {
-        listEl.innerHTML = '<div class="text-center py-10 text-cream-300/15 text-sm">No articles match your filters.</div>';
-        return;
-    }
-
-    listEl.innerHTML = filtered.map(function(a, i) {
-        var d = a.publish_date ? new Date(a.publish_date) : null;
-        var dateStr = d ? d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : 'No date';
-        var bodyPreview = (a.body||'').substring(0, 120).replace(/\n/g,' ');
-        if ((a.body||'').length > 120) bodyPreview += '...';
-        var delay = Math.min(i * 0.04, 0.4);
-
-        return '<div class="fade-in bg-navy-500 rounded-xl border border-gold-400/10 overflow-hidden hover:border-gold-400/20 transition-all" style="animation-delay:'+delay+'s">' +
-            '<div class="p-4 sm:p-5">' +
-                /* Header row */
-                '<div class="flex items-start gap-3 mb-2">' +
-                    '<div class="flex-1 min-w-0">' +
-                        '<h3 class="font-display font-700 text-base text-cream-100 leading-snug">' + esc(a.title) + '</h3>' +
-                        '<div class="flex flex-wrap items-center gap-2 mt-1.5">' +
-                            (a.is_published
-                                ? '<span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-sage-500/15 text-sage-400">Published</span>'
-                                : '<span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-cream-300/5 text-cream-300/25">Draft</span>') +
-                            '<span class="text-[10px] text-cream-300/20 font-medium">' + dateStr + '</span>' +
-                            (a.arena_name ? '<span class="text-[10px] text-cream-300/15">' + esc(a.arena_name) + '</span>' : '') +
-                        '</div>' +
-                    '</div>' +
-                '</div>' +
-                /* Body preview */
-                (bodyPreview ? '<p class="text-xs text-cream-300/25 leading-relaxed mb-3 line-clamp-2">' + esc(bodyPreview) + '</p>' : '') +
-                /* Actions */
-                '<div class="flex flex-wrap items-center gap-2 pt-3 border-t border-gold-400/5">' +
-                    '<button onclick="editArticle(\''+a.id+'\')" class="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-gold-400/40 hover:text-gold-400 transition-colors py-2 px-3 rounded-md hover:bg-gold-400/5">' +
-                        '<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"/></svg>' +
-                        'Edit</button>' +
-                    (a.is_published
-                        ? '<button onclick="togglePublish(\''+a.id+'\',false)" class="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-cream-300/20 hover:text-rust-400 transition-colors py-2 px-3 rounded-md hover:bg-rust-500/5">' +
-                            '<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88"/></svg>' +
-                            'Unpublish</button>'
-                        : '<button onclick="togglePublish(\''+a.id+'\',true)" class="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-sage-400/50 hover:text-sage-400 transition-colors py-2 px-3 rounded-md hover:bg-sage-500/5">' +
-                            '<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/></svg>' +
-                            'Publish</button>') +
-                    '<button onclick="deleteArticle(\''+a.id+'\',\''+esc(a.title).replace(/'/g,"\\'")+'\')" class="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-cream-300/10 hover:text-rust-400 transition-colors py-2 px-3 rounded-md hover:bg-rust-500/5 ml-auto">' +
-                        '<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"/></svg>' +
-                        'Delete</button>' +
-                '</div>' +
-            '</div>' +
-        '</div>';
-    }).join('');
+async function delN(id,title){
+  if(!confirm('Delete "'+title+'"?'))return;
+  try{await fetch('/api/news?id='+id,{method:'DELETE'});toast('Deleted','ok');await loadN()}catch(e){toast('Failed','err')}
 }
 
-// ── Form: open / close / clear ──
-function openForm() {
-    document.getElementById('editId').value = '';
-    document.getElementById('formTitle').textContent = 'New Article';
-    document.getElementById('fTitle').value = '';
-    document.getElementById('fArena').value = '';
-    document.getElementById('fDate').value = new Date().toISOString().split('T')[0];
-    document.getElementById('fBody').value = '';
-    document.getElementById('charCount').textContent = '0 characters';
-    document.getElementById('formError').classList.add('hidden');
-    document.getElementById('formPanel').classList.remove('hidden');
-    document.getElementById('fTitle').focus();
-    window.scrollTo({top:0,behavior:'smooth'});
-}
-
-function closeForm() {
-    document.getElementById('formPanel').classList.add('hidden');
-}
-
-// ── Form: edit (populate from existing) ──
-function editArticle(id) {
-    var a = allArticles.find(function(x){ return x.id === id; });
-    if (!a) return;
-
-    document.getElementById('editId').value = a.id;
-    document.getElementById('formTitle').textContent = 'Edit Article';
-    document.getElementById('fTitle').value = a.title || '';
-    document.getElementById('fArena').value = a.arena_id || '';
-    document.getElementById('fDate').value = a.publish_date ? a.publish_date.split('T')[0] : '';
-    document.getElementById('fBody').value = a.body || '';
-    document.getElementById('charCount').textContent = (a.body||'').length + ' characters';
-    document.getElementById('formError').classList.add('hidden');
-    document.getElementById('formPanel').classList.remove('hidden');
-    window.scrollTo({top:0,behavior:'smooth'});
-}
-
-// ── Save: POST or PUT ──
-async function saveArticle(publish) {
-    var id = document.getElementById('editId').value;
-    var title = document.getElementById('fTitle').value.trim();
-    var body = document.getElementById('fBody').value.trim();
-    var arenaId = document.getElementById('fArena').value;
-    var pubDate = document.getElementById('fDate').value;
-
-    if (!title) { showFormError('Title is required.'); return; }
-    if (!body) { showFormError('Body is required.'); return; }
-
-    var payload = {
-        title: title,
-        body: body,
-        arena_id: arenaId || null,
-        publish_date: pubDate || new Date().toISOString().split('T')[0],
-        is_published: publish
-    };
-
-    try {
-        var url = id ? '/api/news?id='+id : '/api/news';
-        var method = id ? 'PUT' : 'POST';
-
-        var res = await fetch(url, {
-            method: method,
-            headers: {'Content-Type':'application/json'},
-            body: JSON.stringify(payload)
-        });
-
-        if (!res.ok) {
-            var err = await res.json();
-            showFormError(err.error || 'Save failed.');
-            return;
-        }
-
-        closeForm();
-        toast(id ? 'Article updated' : (publish ? 'Article published' : 'Draft saved'), publish ? 'success' : 'info');
-        await loadArticles();
-
-    } catch(e) {
-        showFormError('Network error.');
-    }
-}
-
-// ── Toggle publish ──
-async function togglePublish(id, publish) {
-    try {
-        var res = await fetch('/api/news?id='+id+''/api/news/'+id+'/publish'action=publish', {
-            method: 'PUT',
-            headers: {'Content-Type':'application/json'},
-            body: JSON.stringify({is_published: publish})
-        });
-        if (res.ok) {
-            toast(publish ? 'Article published' : 'Article unpublished', publish ? 'success' : 'info');
-            await loadArticles();
-        }
-    } catch(e) {}
-}
-
-// ── Delete ──
-async function deleteArticle(id, title) {
-    if (!confirm('Delete "'+title+'"?\n\nThis cannot be undone.')) return;
-    try {
-        var res = await fetch('/api/news?id='+id, {method:'DELETE'});
-        if (res.ok) {
-            toast('Article deleted', 'warning');
-            await loadArticles();
-        } else {
-            var err = await res.json();
-            toast(err.error || 'Delete failed', 'error');
-        }
-    } catch(e) {
-        toast('Network error', 'error');
-    }
-}
-
-// ── Form error ──
-function showFormError(msg) {
-    var el = document.getElementById('formError');
-    el.textContent = msg;
-    el.classList.remove('hidden');
-    setTimeout(function(){ el.classList.add('hidden'); }, 5000);
-}
-
-// ── Toast ──
-function toast(msg, type) {
-    type = type || 'success';
-    var colors = {success:'bg-sage-500 text-white',info:'bg-navy-400 text-white',warning:'bg-gold-400 text-navy-500',error:'bg-rust-500 text-white'};
-    var icons = {success:'<path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/>',info:'<path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"/>',warning:'<path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"/>',error:'<path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/>'};
-    var el = document.createElement('div');
-    el.className = 'toast-in flex items-center gap-2 px-4 py-2.5 rounded-lg shadow-lg text-xs font-bold '+(colors[type]||colors.success);
-    el.innerHTML = '<svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">'+(icons[type]||icons.success)+'</svg>'+esc(msg);
-    document.getElementById('toasts').appendChild(el);
-    setTimeout(function(){ el.classList.remove('toast-in'); el.classList.add('toast-out'); setTimeout(function(){ el.remove(); },250); },3000);
-}
-
-function esc(s){return s?String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'):''}
+function toast(msg,type){var el=document.createElement('div');el.className='toast toast-'+(type||'ok');el.textContent=msg;document.getElementById('tw').appendChild(el);setTimeout(function(){el.remove()},3000)}
+function E(s){return s?String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'):''}
 </script>
-
 </body>
 </html>

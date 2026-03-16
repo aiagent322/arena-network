@@ -1,431 +1,166 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Analytics — Arena Network Dashboard</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Analytics — Arena Network</title>
+<link href="https://fonts.googleapis.com/css2?family=Bitter:wght@600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--navy:#0B1D3A;--navy2:#091730;--navy3:#071225;--gold:#C8993C;--cream:#FAF6EF;--rust:#9B4D2B;--sage:#5A7247;--slate:#3C5A8A;--r:10px}
+body{font-family:'DM Sans',system-ui,sans-serif;background:var(--navy2);color:var(--cream);-webkit-text-size-adjust:100%}
+h1,h2,h3{font-family:'Bitter',Georgia,serif}
+a{text-decoration:none;color:inherit}
+canvas{display:block;width:100%!important}
+.side{display:none}.drawer-bg{display:none;position:fixed;inset:0;background:rgba(7,18,37,.6);z-index:40}.drawer-bg.on{display:block}
+.drawer{position:fixed;top:0;left:0;bottom:0;width:260px;background:var(--navy3);z-index:50;transform:translateX(-100%);transition:transform .3s}.drawer.on{transform:translateX(0)}
+.drawer-hdr{height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;border-bottom:1px solid rgba(200,153,60,.08)}
+.drawer-hdr span{font-family:'Bitter',serif;font-weight:700;color:var(--gold);font-size:14px}
+.drawer-x{width:36px;height:36px;border-radius:8px;background:var(--navy);display:flex;align-items:center;justify-content:center;border:0;cursor:pointer;color:rgba(250,246,239,.3)}
+.drawer-x svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.5}
+.drawer nav{padding:12px}.drawer nav a{display:block;padding:12px;border-radius:8px;font-size:13px;font-weight:600;color:rgba(250,246,239,.35);margin-bottom:2px}.drawer nav a.on{color:var(--gold);background:rgba(200,153,60,.08)}
+.topbar{height:56px;background:var(--navy);border-bottom:1px solid rgba(200,153,60,.08);display:flex;align-items:center;justify-content:space-between;padding:0 16px}
+.topbar h1{font-size:16px;font-weight:700}
+.hbtn{width:48px;height:48px;display:flex;align-items:center;justify-content:center;background:var(--navy2);border-radius:8px;border:0;cursor:pointer}
+.hbtn svg{width:20px;height:20px;stroke:var(--gold);fill:none;stroke-width:2}
+.pbtn{display:flex;gap:4px}
+.pbtn button{padding:10px 14px;border-radius:8px;font-size:12px;font-weight:700;border:0;cursor:pointer;font-family:inherit;min-height:44px;background:0;color:rgba(250,246,239,.2)}
+.pbtn button.on{background:rgba(200,153,60,.12);color:var(--gold)}
+.wrap{padding:16px}
+.srow{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:16px}
+.sbox{background:var(--navy);border:1px solid rgba(200,153,60,.08);border-radius:var(--r);padding:12px;text-align:center}
+.sbox b{display:block;font-family:'Bitter',serif;font-weight:800;font-size:18px;color:var(--gold);line-height:1}
+.sbox small{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:rgba(250,246,239,.2);margin-top:2px;display:block}
+.chart-card{background:var(--navy);border:1px solid rgba(200,153,60,.08);border-radius:var(--r);padding:14px;margin-bottom:12px}
+.chart-card h3{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:rgba(250,246,239,.2);margin-bottom:12px}
+.opbar{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.opbar .lbl{width:100px;font-size:11px;font-weight:600;color:rgba(250,246,239,.25);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:0}
+.opbar .bar{flex:1;height:16px;background:var(--navy2);border-radius:8px;overflow:hidden}
+.opbar .bar div{height:100%;border-radius:8px}
+.opbar .val{width:50px;font-size:11px;color:rgba(250,246,239,.2);text-align:right;flex-shrink:0}
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config={theme:{extend:{colors:{navy:{50:'#E8ECF2',100:'#C5CEE0',400:'#3C5A8A',500:'#0B1D3A',600:'#091730',700:'#071225'},gold:{50:'#FDF8EE',100:'#F9EDCC',300:'#E8C46D',400:'#C8993C',500:'#B5882F',600:'#9A7226'},cream:{50:'#FEFDFB',100:'#FAF6EF',200:'#F2EBE0',300:'#E8DFD0'},rust:{400:'#B85A3A',500:'#9B4D2B',600:'#7F3E22'},sage:{400:'#6D8A56',500:'#5A7247',600:'#4A5E3B'}},fontFamily:{display:['Bitter','Georgia','serif'],body:['DM Sans','system-ui','sans-serif']}}}}
-    </script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bitter:wght@500;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-    <style>
-        body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;opacity:0.02;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
-        .mobile-drawer{transform:translateX(-100%);transition:transform .3s ease}.mobile-drawer.open{transform:translateX(0)}
-        @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}.fade-in{animation:fadeIn .3s ease-out forwards}
-        canvas{display:block;width:100%!important;height:auto!important}
-        ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:#091730}::-webkit-scrollbar-thumb{background:#C8993C;border-radius:3px}
-    </style>
+@media(min-width:640px){.srow{grid-template-columns:repeat(4,1fr)}.wrap{padding:20px}}
+@media(min-width:1024px){
+  .hbtn{display:none}
+  .side{display:flex;flex-direction:column;width:220px;flex-shrink:0;background:var(--navy3);border-right:1px solid rgba(200,153,60,.08);position:fixed;top:0;bottom:0;left:0;z-index:30}
+  .side-hdr{height:56px;display:flex;align-items:center;padding:0 16px;border-bottom:1px solid rgba(200,153,60,.08)}
+  .side-hdr a{display:flex;align-items:center;gap:8px}.side-hdr .si{width:28px;height:28px;background:var(--gold);border-radius:7px;display:flex;align-items:center;justify-content:center}
+  .side-hdr .si svg{width:14px;height:14px;stroke:var(--navy);fill:none;stroke-width:2.2}.side-hdr span{font-family:'Bitter',serif;font-weight:700;color:var(--gold);font-size:13px}
+  .side nav{padding:12px;flex:1}.side nav a{display:block;padding:10px 12px;border-radius:8px;font-size:13px;font-weight:600;color:rgba(250,246,239,.3);margin-bottom:2px}
+  .side nav a:hover{color:var(--gold);background:rgba(200,153,60,.05)}.side nav a.on{color:var(--gold);background:rgba(200,153,60,.08)}
+  .side-ft{padding:12px;border-top:1px solid rgba(200,153,60,.08)}.side-ft a{font-size:11px;color:rgba(250,246,239,.2);padding:8px}
+  .page{margin-left:220px}
+  .cg2{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+}
+</style>
 </head>
+<body>
+<aside class="side"><div class="side-hdr"><a href="../index.html"><div class="si"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18"/></svg></div><span>ARENA NET</span></a></div><nav><a href="dashboard.html">Overview</a><a href="events.html">Events</a><a href="news.html">News</a><a href="analytics.html" class="on">Analytics</a></nav><div class="side-ft"><a href="../index.html">← Back to Site</a></div></aside>
+<div class="drawer-bg" id="dbg" onclick="tog()"></div>
+<div class="drawer" id="dw"><div class="drawer-hdr"><span>ANALYTICS</span><button class="drawer-x" onclick="tog()"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M6 18 18 6M6 6l12 12"/></svg></button></div><nav><a href="dashboard.html">Overview</a><a href="events.html">Events</a><a href="news.html">News</a><a href="analytics.html" class="on">Analytics</a></nav></div>
 
-<body class="bg-navy-600 text-cream-100 font-body min-h-screen">
-
-<div class="flex min-h-screen">
-
-    <!-- ═══════ SIDEBAR (desktop) ═══════ -->
-    <aside class="hidden lg:flex flex-col w-60 flex-shrink-0 bg-navy-700 border-r border-gold-400/10">
-        <div class="h-16 flex items-center px-5 border-b border-gold-400/10">
-            <a href="../index.html" class="flex items-center gap-2">
-                <div class="w-8 h-8 rounded-lg bg-gold-400 flex items-center justify-center">
-                    <svg class="w-4 h-4 text-navy-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21"/></svg>
-                </div>
-                <span class="font-display font-700 text-gold-400 text-sm tracking-wide">ARENA NET</span>
-            </a>
-        </div>
-        <nav class="flex-1 py-4 px-3 space-y-0.5 overflow-y-auto">
-            <a href="dashboard.html#profile" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold text-cream-300/40 hover:text-gold-400 hover:bg-gold-400/5 transition-all"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21"/></svg>Arena Profile</a>
-            <a href="events.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold text-cream-300/40 hover:text-gold-400 hover:bg-gold-400/5 transition-all"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"/></svg>Events</a>
-            <a href="news.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold text-cream-300/40 hover:text-gold-400 hover:bg-gold-400/5 transition-all"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 0 1-2.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 0 0 2.25 2.25h13.5"/></svg>News</a>
-            <a href="analytics.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold text-gold-400 bg-gold-400/10 transition-all"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z"/></svg>Analytics</a>
-        </nav>
-        <div class="p-3 border-t border-gold-400/10">
-            <a href="../index.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-cream-300/30 hover:text-gold-400 hover:bg-gold-400/5 transition-all text-xs font-semibold"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"/></svg>Back to Site</a>
-        </div>
-    </aside>
-
-    <!-- Mobile drawer -->
-    <div id="drawerBg" class="fixed inset-0 bg-navy-700/60 z-40 hidden lg:hidden" onclick="toggleDrawer()"></div>
-    <aside id="drawer" class="mobile-drawer fixed inset-y-0 left-0 w-64 bg-navy-700 z-50 lg:hidden flex flex-col">
-        <div class="h-16 flex items-center justify-between px-5 border-b border-gold-400/10">
-            <span class="font-display font-700 text-gold-400 text-sm">ANALYTICS</span>
-            <button onclick="toggleDrawer()" class="w-8 h-8 rounded-lg bg-navy-500 flex items-center justify-center text-cream-300/40 hover:text-gold-400"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg></button>
-        </div>
-        <nav class="flex-1 py-4 px-3 space-y-0.5">
-            <a href="dashboard.html#profile" class="block px-3 py-2.5 rounded-lg text-sm font-semibold text-cream-300/40">Arena Profile</a>
-            <a href="events.html" class="block px-3 py-2.5 rounded-lg text-sm font-semibold text-cream-300/40">Events</a>
-            <a href="news.html" class="block px-3 py-2.5 rounded-lg text-sm font-semibold text-cream-300/40">News</a>
-            <a href="analytics.html" class="block px-3 py-2.5 rounded-lg text-sm font-semibold text-gold-400 bg-gold-400/10">Analytics</a>
-        </nav>
-    </aside>
-
-    <!-- ═══════ MAIN ═══════ -->
-    <div class="flex-1 flex flex-col min-w-0">
-
-        <header class="h-16 bg-navy-500 border-b border-gold-400/10 flex items-center justify-between px-4 sm:px-6 flex-shrink-0">
-            <div class="flex items-center gap-3">
-                <button onclick="toggleDrawer()" class="lg:hidden w-9 h-9 rounded-lg bg-navy-600 flex items-center justify-center text-gold-400"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/></svg></button>
-                <h1 class="font-display font-700 text-lg text-cream-100">Analytics</h1>
-            </div>
-            <!-- Period selector -->
-            <div class="flex gap-1" id="periodBtns">
-                <button onclick="setPeriod(7)" data-d="7" class="px-4 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors">7d</button>
-                <button onclick="setPeriod(30)" data-d="30" class="px-4 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors">30d</button>
-                <button onclick="setPeriod(90)" data-d="90" class="px-4 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors">90d</button>
-            </div>
-        </header>
-
-        <main class="flex-1 overflow-y-auto p-4 sm:p-6" id="content">
-
-            <!-- ═══════ TOP STATS ═══════ -->
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6" id="topStats"></div>
-
-            <!-- ═══════ ROW 1: Event Views + Vendor Views ═══════ -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
-                <!-- Event views by type (bar chart) -->
-                <div class="bg-navy-500 rounded-xl border border-gold-400/10 p-4 sm:p-5">
-                    <h3 class="text-[10px] font-bold uppercase tracking-wider text-cream-300/25 mb-4">Event Page Views by Type</h3>
-                    <canvas id="chartEvents" height="200"></canvas>
-                    <div id="legendEvents" class="flex flex-wrap gap-3 mt-3"></div>
-                </div>
-                <!-- Vendor views by category (donut chart) -->
-                <div class="bg-navy-500 rounded-xl border border-gold-400/10 p-4 sm:p-5">
-                    <h3 class="text-[10px] font-bold uppercase tracking-wider text-cream-300/25 mb-4">Vendor Page Views by Category</h3>
-                    <div class="flex flex-col sm:flex-row items-center gap-4">
-                        <canvas id="chartVendors" width="180" height="180" style="max-width:180px;max-height:180px;"></canvas>
-                        <div id="legendVendors" class="flex-1 space-y-1.5"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ═══════ ROW 2: Calendar Traffic (line chart) ═══════ -->
-            <div class="bg-navy-500 rounded-xl border border-gold-400/10 p-4 sm:p-5 mb-4">
-                <h3 class="text-[10px] font-bold uppercase tracking-wider text-cream-300/25 mb-4">Calendar Traffic — Daily Event Density</h3>
-                <canvas id="chartCalendar" height="160"></canvas>
-            </div>
-
-            <!-- ═══════ ROW 3: LLM Usage ═══════ -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
-                <!-- LLM token usage (bar chart) -->
-                <div class="bg-navy-500 rounded-xl border border-gold-400/10 p-4 sm:p-5">
-                    <h3 class="text-[10px] font-bold uppercase tracking-wider text-cream-300/25 mb-4">LLM Usage — Daily Tokens</h3>
-                    <canvas id="chartLLM" height="180"></canvas>
-                </div>
-                <!-- LLM cost + breakdown -->
-                <div class="bg-navy-500 rounded-xl border border-gold-400/10 p-4 sm:p-5">
-                    <h3 class="text-[10px] font-bold uppercase tracking-wider text-cream-300/25 mb-4">LLM Cost &amp; Operations</h3>
-                    <div id="llmStats" class="grid grid-cols-2 gap-3 mb-4"></div>
-                    <div id="llmOps" class="space-y-2"></div>
-                </div>
-            </div>
-
-        </main>
-    </div>
+<div class="page">
+<div class="topbar">
+  <div style="display:flex;align-items:center;gap:10px"><button class="hbtn" onclick="tog()"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/></svg></button><h1>Analytics</h1></div>
+  <div class="pbtn" id="pb"></div>
+</div>
+<div class="wrap">
+  <div class="srow" id="ts"></div>
+  <div class="cg2">
+    <div class="chart-card"><h3>Events by Type</h3><canvas id="c1" height="180"></canvas></div>
+    <div class="chart-card"><h3>Calendar Density</h3><canvas id="c2" height="180"></canvas></div>
+  </div>
+  <div class="cg2" style="margin-top:12px">
+    <div class="chart-card"><h3>LLM Token Usage</h3><canvas id="c3" height="180"></canvas></div>
+    <div class="chart-card"><h3>LLM Operations</h3><div id="ops"></div></div>
+  </div>
+</div>
 </div>
 
 <script>
-var API = '';
-var period = 30;
-var COLORS = {
-    gold:'#C8993C', navy:'#0B1D3A', rust:'#9B4D2B', sage:'#5A7247',
-    slate:'#3C5A8A', cream:'#E8DFD0', sand:'#FAF6EF',
-    chart: ['#C8993C','#5A7247','#9B4D2B','#3C5A8A','#B5882F','#6D8A56','#7F3E22','#8B6E4E','#4A5E3B','#C5CEE0']
-};
+function tog(){document.getElementById('dw').classList.toggle('on');document.getElementById('dbg').classList.toggle('on')}
+var P=30,CL=['#C8993C','#5A7247','#9B4D2B','#3C5A8A','#B5882F','#6D8A56'];
 
-function toggleDrawer(){document.getElementById('drawer').classList.toggle('open');document.getElementById('drawerBg').classList.toggle('hidden');}
+function setP(d){P=d;document.querySelectorAll('#pb button').forEach(function(b){b.className=parseInt(b.dataset.d)===d?'on':''});go()}
+document.getElementById('pb').innerHTML=[7,30,90].map(function(d){return '<button data-d="'+d+'" class="'+(d===30?'on':'')+'" onclick="setP('+d+')">'+d+'d</button>'}).join('');
 
-function setPeriod(d){
-    period=d;
-    document.querySelectorAll('#periodBtns button').forEach(function(b){
-        var active=parseInt(b.dataset.d)===d;
-        b.className='px-4 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors '+(active?'bg-gold-400/15 text-gold-400':'text-cream-300/20 hover:text-cream-300/40');
-    });
-    loadAll();
+go();
+async function go(){
+  var[ev,vn,llm]=await Promise.all([
+    fetch('/api/events?limit=500&approved=true').then(function(r){return r.json()}).catch(function(){return{events:[]}}),
+    fetch('/api/vendors?limit=500').then(function(r){return r.json()}).catch(function(){return{vendors:[]}}),
+    fetch('/api/llm-usage?days='+P).then(function(r){return r.json()}).catch(function(){return{summary:{},by_operation:[],daily:[]}})
+  ]);
+  var evts=ev.events||[],vnds=vn.vendors||[],s=llm.summary||{};
+  var up=evts.filter(function(e){return e.start_date>=new Date().toISOString().split('T')[0]}).length;
+  document.getElementById('ts').innerHTML=sb(evts.length,'Events')+sb(vnds.length,'Vendors')+sb(up,'Upcoming')+sb('$'+(parseFloat(s.total_cost||0)).toFixed(2),'LLM Cost');
+
+  // Events by type
+  var types={};evts.forEach(function(e){var t=e.event_type||'other';types[t]=(types[t]||0)+1});
+  bars('c1',Object.keys(types).map(cap),Object.values(types),CL);
+
+  // Calendar density
+  var daily={};var now=new Date();
+  for(var i=P-1;i>=0;i--){var d=new Date(now);d.setDate(d.getDate()-i);daily[ds(d)]=0}
+  evts.forEach(function(e){if(!e.start_date)return;var sd=e.start_date.split('T')[0],ed=(e.end_date||e.start_date).split('T')[0];
+    var c=new Date(sd);while(ds(c)<=ed){var k=ds(c);if(daily.hasOwnProperty(k))daily[k]++;c.setDate(c.getDate()+1)}});
+  var dates=Object.keys(daily).sort();
+  line('c2',dates.map(function(d){var p=d.split('-');return parseInt(p[1])+'/'+parseInt(p[2])}),dates.map(function(d){return daily[d]}),'#C8993C');
+
+  // LLM daily
+  var ld=(llm.daily||[]).slice().reverse();
+  if(ld.length)bars('c3',ld.map(function(d){var p=(d.date||'').split('-');return parseInt(p[1])+'/'+parseInt(p[2])}),ld.map(function(d){return parseInt(d.total_tokens||0)}),['#C8993C']);
+  else{var ctx=document.getElementById('c3').getContext('2d');ctx.fillStyle='rgba(200,153,60,.15)';ctx.font='600 12px DM Sans';ctx.textAlign='center';ctx.fillText('No LLM data',ctx.canvas.clientWidth/2,90)}
+
+  // LLM ops
+  var ops=llm.by_operation||[];
+  var maxT=ops.length?Math.max.apply(null,ops.map(function(o){return parseInt(o.total_tokens||0)})):1;
+  document.getElementById('ops').innerHTML=ops.length?ops.map(function(o,i){
+    var pct=maxT>0?(parseInt(o.total_tokens||0)/maxT*100):0;
+    return '<div class="opbar"><span class="lbl">'+cap(o.operation)+'</span><div class="bar"><div style="width:'+pct+'%;background:'+CL[i%CL.length]+'"></div></div><span class="val">'+fmt(parseInt(o.total_tokens||0))+'</span></div>';
+  }).join(''):'<div style="text-align:center;padding:24px;color:rgba(250,246,239,.1);font-size:12px">No operations</div>';
 }
 
-// ═══════════════════════════════════════════════
-// DATA LOADING
-// ═══════════════════════════════════════════════
+function sb(v,l){return '<div class="sbox"><b>'+v+'</b><small>'+l+'</small></div>'}
 
-async function loadAll(){
-    var [events,vendors,llm]=await Promise.all([loadEvents(),loadVendors(),loadLLM()]);
-    renderTopStats(events,vendors,llm);
-    renderEventChart(events);
-    renderVendorChart(vendors);
-    renderCalendarChart(events);
-    renderLLMChart(llm);
-    renderLLMDetails(llm);
+function bars(id,labels,values,colors){
+  var c=document.getElementById(id);var dpr=window.devicePixelRatio||1;
+  var w=c.clientWidth,h=parseInt(c.getAttribute('height'))||180;
+  c.width=w*dpr;c.height=h*dpr;c.style.height=h+'px';
+  var ctx=c.getContext('2d');ctx.scale(dpr,dpr);
+  var pad={t:8,r:8,b:28,l:36},cw=w-pad.l-pad.r,ch=h-pad.t-pad.b;
+  var max=Math.max.apply(null,values)||1;
+  var bw=Math.min(32,cw/values.length*.6),gap=(cw-bw*values.length)/(values.length+1);
+  for(var i=0;i<=3;i++){var y=pad.t+ch-(ch/3*i);ctx.strokeStyle='rgba(200,153,60,.06)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(w-pad.r,y);ctx.stroke();
+    ctx.fillStyle='rgba(200,153,60,.15)';ctx.font='600 9px DM Sans';ctx.textAlign='right';ctx.fillText(fmt(max/3*i),pad.l-4,y+3)}
+  values.forEach(function(v,i){var bh=v/max*ch;var x=pad.l+gap+(bw+gap)*i;var y=pad.t+ch-bh;
+    ctx.fillStyle=colors[i%colors.length];ctx.beginPath();ctx.moveTo(x+3,y);ctx.lineTo(x+bw-3,y);ctx.quadraticCurveTo(x+bw,y,x+bw,y+3);ctx.lineTo(x+bw,pad.t+ch);ctx.lineTo(x,pad.t+ch);ctx.lineTo(x,y+3);ctx.quadraticCurveTo(x,y,x+3,y);ctx.fill();
+    ctx.fillStyle='rgba(200,153,60,.2)';ctx.font='600 8px DM Sans';ctx.textAlign='center';ctx.fillText(labels[i],x+bw/2,h-pad.b+14)});
 }
 
-async function loadEvents(){
-    try{var r=await fetch('/api/events?limit=500&approved=true');var d=await r.json();return d.events||[];}catch(e){return[];}
-}
-async function loadVendors(){
-    try{var r=await fetch('/api/vendors?limit=500');var d=await r.json();return d.vendors||[];}catch(e){return[];}
-}
-async function loadLLM(){
-    try{var r=await fetch('/api/llm-usage?days='+period);return await r.json();}catch(e){return{summary:{},by_operation:[],daily:[],by_arena:[]};}
-}
-
-// ═══════════════════════════════════════════════
-// TOP STATS
-// ═══════════════════════════════════════════════
-
-function renderTopStats(events,vendors,llm){
-    var s=llm.summary||{};
-    var upcoming=events.filter(function(e){return e.start_date&&e.start_date.split('T')[0]>=new Date().toISOString().split('T')[0]}).length;
-    document.getElementById('topStats').innerHTML=
-        statBox(events.length,'Events')+statBox(vendors.length,'Vendors')+
-        statBox(upcoming,'Upcoming')+statBox('$'+(parseFloat(s.total_cost||0)).toFixed(2),'LLM Cost');
+function line(id,labels,values,color){
+  var c=document.getElementById(id);var dpr=window.devicePixelRatio||1;
+  var w=c.clientWidth,h=parseInt(c.getAttribute('height'))||180;
+  c.width=w*dpr;c.height=h*dpr;c.style.height=h+'px';
+  var ctx=c.getContext('2d');ctx.scale(dpr,dpr);
+  var pad={t:8,r:8,b:28,l:32},cw=w-pad.l-pad.r,ch=h-pad.t-pad.b;
+  var max=Math.max.apply(null,values)||1;var step=cw/((values.length-1)||1);
+  ctx.beginPath();ctx.moveTo(pad.l,pad.t+ch);
+  values.forEach(function(v,i){ctx.lineTo(pad.l+step*i,pad.t+ch-v/max*ch)});
+  ctx.lineTo(pad.l+step*(values.length-1),pad.t+ch);ctx.closePath();ctx.fillStyle=color+'18';ctx.fill();
+  ctx.beginPath();values.forEach(function(v,i){var x=pad.l+step*i,y=pad.t+ch-v/max*ch;i===0?ctx.moveTo(x,y):ctx.lineTo(x,y)});
+  ctx.strokeStyle=color;ctx.lineWidth=2;ctx.lineJoin='round';ctx.stroke();
+  values.forEach(function(v,i){var x=pad.l+step*i,y=pad.t+ch-v/max*ch;ctx.beginPath();ctx.arc(x,y,3,0,Math.PI*2);ctx.fillStyle=color;ctx.fill();ctx.beginPath();ctx.arc(x,y,1.5,0,Math.PI*2);ctx.fillStyle=getComputedStyle(document.body).backgroundColor;ctx.fill()});
+  var skip=Math.max(1,Math.floor(labels.length/6));
+  ctx.fillStyle='rgba(200,153,60,.15)';ctx.font='600 8px DM Sans';ctx.textAlign='center';
+  labels.forEach(function(l,i){if(i%skip===0)ctx.fillText(l,pad.l+step*i,h-pad.b+14)});
 }
 
-function statBox(val,label){
-    return '<div class="bg-navy-500 rounded-xl border border-gold-400/10 p-4 text-center fade-in">'+
-        '<div class="font-display font-800 text-xl sm:text-2xl text-gold-400 leading-none">'+val+'</div>'+
-        '<div class="text-[10px] font-semibold uppercase tracking-wider text-cream-300/25 mt-1">'+label+'</div></div>';
-}
-
-// ═══════════════════════════════════════════════
-// CHART ENGINE — Pure Canvas
-// ═══════════════════════════════════════════════
-
-function getCtx(id){
-    var c=document.getElementById(id);
-    var dpr=window.devicePixelRatio||1;
-    var rect=c.getBoundingClientRect();
-    c.width=rect.width*dpr;
-    c.height=(parseInt(c.getAttribute('height'))||200)*dpr;
-    c.style.height=(parseInt(c.getAttribute('height'))||200)+'px';
-    var ctx=c.getContext('2d');
-    ctx.scale(dpr,dpr);
-    return {ctx:ctx,w:rect.width,h:parseInt(c.getAttribute('height'))||200};
-}
-
-// ── Bar Chart ──
-function drawBars(id,labels,values,colors,opts){
-    opts=opts||{};
-    var g=getCtx(id),ctx=g.ctx,w=g.w,h=g.h;
-    var pad={t:10,r:10,b:30,l:45};
-    var cw=w-pad.l-pad.r,ch=h-pad.t-pad.b;
-    var max=Math.max.apply(null,values)||1;
-    var barW=Math.min(40,cw/values.length*0.6);
-    var gap=(cw-barW*values.length)/(values.length+1);
-
-    // Y axis lines
-    ctx.strokeStyle='rgba(200,153,60,0.08)';ctx.lineWidth=1;
-    for(var i=0;i<=4;i++){
-        var y=pad.t+ch-(ch/4*i);
-        ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(w-pad.r,y);ctx.stroke();
-        ctx.fillStyle='rgba(200,153,60,0.2)';ctx.font='600 9px "DM Sans"';ctx.textAlign='right';
-        ctx.fillText(fmt(max/4*i),pad.l-6,y+3);
-    }
-
-    // Bars
-    values.forEach(function(v,i){
-        var bh=v/max*ch;
-        var x=pad.l+gap+(barW+gap)*i;
-        var y=pad.t+ch-bh;
-        ctx.fillStyle=colors[i%colors.length];
-        roundRect(ctx,x,y,barW,bh,3);
-        // Label
-        ctx.fillStyle='rgba(200,153,60,0.3)';ctx.font='600 9px "DM Sans"';ctx.textAlign='center';
-        ctx.fillText(labels[i],x+barW/2,h-pad.b+14);
-        // Value on top
-        if(v>0){ctx.fillStyle='rgba(250,246,239,0.5)';ctx.fillText(fmt(v),x+barW/2,y-4);}
-    });
-}
-
-// ── Line Chart ──
-function drawLine(id,labels,values,color,opts){
-    opts=opts||{};
-    var g=getCtx(id),ctx=g.ctx,w=g.w,h=g.h;
-    var pad={t:10,r:10,b:30,l:40};
-    var cw=w-pad.l-pad.r,ch=h-pad.t-pad.b;
-    var max=Math.max.apply(null,values)||1;
-    var step=cw/(values.length-1||1);
-
-    // Grid
-    ctx.strokeStyle='rgba(200,153,60,0.06)';ctx.lineWidth=1;
-    for(var i=0;i<=4;i++){
-        var y=pad.t+ch-(ch/4*i);
-        ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(w-pad.r,y);ctx.stroke();
-        ctx.fillStyle='rgba(200,153,60,0.15)';ctx.font='600 9px "DM Sans"';ctx.textAlign='right';
-        ctx.fillText(fmt(max/4*i),pad.l-6,y+3);
-    }
-
-    // Fill area
-    ctx.beginPath();
-    ctx.moveTo(pad.l,pad.t+ch);
-    values.forEach(function(v,i){ctx.lineTo(pad.l+step*i,pad.t+ch-v/max*ch);});
-    ctx.lineTo(pad.l+step*(values.length-1),pad.t+ch);
-    ctx.closePath();
-    ctx.fillStyle=color+'18';ctx.fill();
-
-    // Line
-    ctx.beginPath();
-    values.forEach(function(v,i){
-        var x=pad.l+step*i,y=pad.t+ch-v/max*ch;
-        i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
-    });
-    ctx.strokeStyle=color;ctx.lineWidth=2;ctx.lineJoin='round';ctx.stroke();
-
-    // Dots
-    values.forEach(function(v,i){
-        var x=pad.l+step*i,y=pad.t+ch-v/max*ch;
-        ctx.beginPath();ctx.arc(x,y,3,0,Math.PI*2);ctx.fillStyle=color;ctx.fill();
-        ctx.beginPath();ctx.arc(x,y,1.5,0,Math.PI*2);ctx.fillStyle='#091730';ctx.fill();
-    });
-
-    // X labels (show subset)
-    ctx.fillStyle='rgba(200,153,60,0.2)';ctx.font='600 8px "DM Sans"';ctx.textAlign='center';
-    var skipX=Math.max(1,Math.floor(labels.length/8));
-    labels.forEach(function(l,i){if(i%skipX===0)ctx.fillText(l,pad.l+step*i,h-pad.b+14);});
-}
-
-// ── Donut Chart ──
-function drawDonut(id,labels,values,colors){
-    var c=document.getElementById(id);
-    var dpr=window.devicePixelRatio||1;
-    var size=180;
-    c.width=size*dpr;c.height=size*dpr;
-    c.style.width=size+'px';c.style.height=size+'px';
-    var ctx=c.getContext('2d');ctx.scale(dpr,dpr);
-    var cx=size/2,cy=size/2,r=size/2-10,inner=r*0.55;
-    var total=values.reduce(function(s,v){return s+v},0)||1;
-    var angle=-Math.PI/2;
-
-    values.forEach(function(v,i){
-        var slice=v/total*Math.PI*2;
-        ctx.beginPath();ctx.moveTo(cx+Math.cos(angle)*inner,cy+Math.sin(angle)*inner);
-        ctx.arc(cx,cy,r,angle,angle+slice);
-        ctx.arc(cx,cy,inner,angle+slice,angle,true);
-        ctx.closePath();ctx.fillStyle=colors[i%colors.length];ctx.fill();
-        angle+=slice;
-    });
-
-    // Center text
-    ctx.fillStyle='rgba(250,246,239,0.6)';ctx.font='700 22px Bitter';ctx.textAlign='center';ctx.textBaseline='middle';
-    ctx.fillText(total.toString(),cx,cy-4);
-    ctx.fillStyle='rgba(200,153,60,0.3)';ctx.font='600 9px "DM Sans"';
-    ctx.fillText('TOTAL',cx,cy+12);
-}
-
-// ── Horizontal Bars (for LLM ops) ──
-function hBar(label,value,max,color){
-    var pct=max>0?(value/max*100):0;
-    return '<div class="flex items-center gap-3">'+
-        '<span class="w-24 sm:w-32 text-[11px] font-semibold text-cream-300/30 truncate flex-shrink-0">'+esc(label)+'</span>'+
-        '<div class="flex-1 h-5 bg-navy-600 rounded-full overflow-hidden">'+
-        '<div class="h-full rounded-full transition-all" style="width:'+pct+'%;background:'+color+'"></div></div>'+
-        '<span class="w-16 text-[11px] text-cream-300/20 text-right flex-shrink-0">'+fmt(value)+'</span></div>';
-}
-
-// ── Helpers ──
-function roundRect(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h);ctx.lineTo(x,y+h);ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.fill();}
-function fmt(n){n=Math.round(n);if(n>=1000000)return(n/1000000).toFixed(1)+'M';if(n>=1000)return(n/1000).toFixed(n>=10000?0:1)+'K';return n.toString();}
-function esc(s){return s?String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'):''}
+function ds(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function fmt(n){n=Math.round(n);return n>=1000?(n/1000).toFixed(n>=10000?0:1)+'K':n.toString()}
 function cap(s){return s?s.split(/[\s-]+/).map(function(w){return w.charAt(0).toUpperCase()+w.slice(1)}).join(' '):''}
 
-// ═══════════════════════════════════════════════
-// CHART RENDERERS
-// ═══════════════════════════════════════════════
-
-function renderEventChart(events){
-    var types={};
-    events.forEach(function(e){var t=e.event_type||'other';types[t]=(types[t]||0)+1;});
-    var labels=Object.keys(types).map(cap);
-    var values=Object.values(types);
-    drawBars('chartEvents',labels,values,COLORS.chart);
-    // Legend
-    document.getElementById('legendEvents').innerHTML=Object.keys(types).map(function(t,i){
-        return '<span class="flex items-center gap-1.5 text-[10px] text-cream-300/30"><span class="w-2.5 h-2.5 rounded-sm flex-shrink-0" style="background:'+COLORS.chart[i%COLORS.chart.length]+'"></span>'+cap(t)+' ('+types[t]+')</span>';
-    }).join('');
-}
-
-function renderVendorChart(vendors){
-    var cats={};
-    vendors.forEach(function(v){var c=v.category||'other';cats[c]=(cats[c]||0)+1;});
-    var labels=Object.keys(cats);
-    var values=Object.values(cats);
-    drawDonut('chartVendors',labels,values,COLORS.chart);
-    // Legend
-    document.getElementById('legendVendors').innerHTML=labels.map(function(l,i){
-        return '<div class="flex items-center justify-between gap-2">'+
-            '<span class="flex items-center gap-1.5 text-[11px] text-cream-300/40 truncate"><span class="w-2.5 h-2.5 rounded-sm flex-shrink-0" style="background:'+COLORS.chart[i%COLORS.chart.length]+'"></span>'+cap(l)+'</span>'+
-            '<span class="text-[11px] font-semibold text-cream-300/20">'+values[i]+'</span></div>';
-    }).join('');
-}
-
-function renderCalendarChart(events){
-    // Build daily event count for the period
-    var daily={};
-    var now=new Date();
-    for(var i=period-1;i>=0;i--){
-        var d=new Date(now);d.setDate(d.getDate()-i);
-        daily[d.toISOString().split('T')[0]]=0;
-    }
-    events.forEach(function(e){
-        if(!e.start_date)return;
-        var sd=e.start_date.split('T')[0];
-        var ed=(e.end_date||e.start_date).split('T')[0];
-        // Count each day the event spans
-        var cur=new Date(sd);
-        var end=new Date(ed);
-        while(cur<=end){
-            var key=cur.toISOString().split('T')[0];
-            if(daily.hasOwnProperty(key))daily[key]++;
-            cur.setDate(cur.getDate()+1);
-        }
-    });
-
-    var dates=Object.keys(daily).sort();
-    var labels=dates.map(function(d){var p=d.split('-');return parseInt(p[1])+'/'+parseInt(p[2]);});
-    var values=dates.map(function(d){return daily[d];});
-    drawLine('chartCalendar',labels,values,COLORS.gold);
-}
-
-function renderLLMChart(llm){
-    var dailyData=(llm.daily||[]).slice().reverse();
-    if(dailyData.length===0){
-        var g=getCtx('chartLLM');
-        g.ctx.fillStyle='rgba(200,153,60,0.1)';g.ctx.font='600 12px "DM Sans"';g.ctx.textAlign='center';
-        g.ctx.fillText('No LLM usage data',g.w/2,g.h/2);
-        return;
-    }
-    var labels=dailyData.map(function(d){var p=(d.date||'').split('-');return parseInt(p[1])+'/'+parseInt(p[2]);});
-    var values=dailyData.map(function(d){return parseInt(d.total_tokens||0);});
-    drawBars('chartLLM',labels,values,[COLORS.gold]);
-}
-
-function renderLLMDetails(llm){
-    var s=llm.summary||{};
-    document.getElementById('llmStats').innerHTML=
-        '<div class="bg-navy-600 rounded-lg p-3 text-center"><div class="font-display font-700 text-lg text-gold-400 leading-none">'+fmt(parseInt(s.total_calls||0))+'</div><div class="text-[9px] font-semibold uppercase tracking-wider text-cream-300/20 mt-1">API Calls</div></div>'+
-        '<div class="bg-navy-600 rounded-lg p-3 text-center"><div class="font-display font-700 text-lg text-gold-400 leading-none">'+fmt(parseInt(s.total_tokens||0))+'</div><div class="text-[9px] font-semibold uppercase tracking-wider text-cream-300/20 mt-1">Tokens</div></div>'+
-        '<div class="bg-navy-600 rounded-lg p-3 text-center"><div class="font-display font-700 text-lg text-gold-400 leading-none">$'+(parseFloat(s.total_cost||0)).toFixed(4)+'</div><div class="text-[9px] font-semibold uppercase tracking-wider text-cream-300/20 mt-1">Cost</div></div>'+
-        '<div class="bg-navy-600 rounded-lg p-3 text-center"><div class="font-display font-700 text-lg text-gold-400 leading-none">'+fmt(parseInt(s.avg_tokens_per_call||0))+'</div><div class="text-[9px] font-semibold uppercase tracking-wider text-cream-300/20 mt-1">Avg/Call</div></div>';
-
-    // Operation breakdown
-    var ops=llm.by_operation||[];
-    var maxT=ops.length>0?Math.max.apply(null,ops.map(function(o){return parseInt(o.total_tokens||0)})):1;
-    document.getElementById('llmOps').innerHTML=ops.length===0
-        ?'<div class="text-center py-6 text-cream-300/10 text-xs">No operations recorded</div>'
-        :ops.map(function(o,i){return hBar(cap(o.operation)+(o.model?' · '+o.model:''),parseInt(o.total_tokens||0),maxT,COLORS.chart[i%COLORS.chart.length]);}).join('');
-}
-
-// ═══════════════════════════════════════════════
-// INIT
-// ═══════════════════════════════════════════════
-
-setPeriod(30);
-
-// Redraw charts on resize
-var resizeTimer;
-window.addEventListener('resize',function(){clearTimeout(resizeTimer);resizeTimer=setTimeout(loadAll,300);});
+var RT;window.addEventListener('resize',function(){clearTimeout(RT);RT=setTimeout(go,300)});
 </script>
-
 </body>
 </html>
