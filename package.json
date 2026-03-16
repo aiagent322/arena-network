@@ -1,0 +1,20 @@
+{
+  "name": "arena-network",
+  "version": "1.0.0",
+  "description": "League of Agricultural and Equine Centers — Calendar & Directory Platform",
+  "main": "backend/server.js",
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "node --watch backend/server.js",
+    "db:init": "psql -f database/schema.sql",
+    "db:reset": "psql -c 'DROP DATABASE IF EXISTS arena_network' && psql -c 'CREATE DATABASE arena_network' && psql -d arena_network -f database/schema.sql"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.0",
+    "pg": "^8.13.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
