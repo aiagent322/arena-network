@@ -1,503 +1,299 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arena Network — League of Agricultural &amp; Equine Centers</title>
-    <meta name="description" content="The national directory for agricultural and equine arenas, fairgrounds, and event centers across America.">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arena Network — League of Agricultural & Equine Centers</title>
+<meta name="description" content="National directory for agricultural and equine arenas, fairgrounds, and event centers.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bitter:wght@600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════
+   PHONE FIRST — 320px base
+   Every rule below is the phone layout.
+   Tablet and desktop are ONLY in @media blocks.
+   ═══════════════════════════════════════════ */
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--navy:#0B1D3A;--gold:#C8993C;--cream:#FAF6EF;--cream2:#F2EBE0;--cream3:#E8DFD0;--rust:#9B4D2B;--sage:#5A7247;--slate:#3C5A8A;--white:#FFF;--r:10px}
+body{font-family:'DM Sans',system-ui,sans-serif;background:var(--cream);color:var(--navy);-webkit-text-size-adjust:100%}
+h1,h2,h3{font-family:'Bitter',Georgia,serif}
+a{text-decoration:none;color:inherit}
 
-    <!-- TailwindCSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        navy:   { 50: '#E8ECF2', 100: '#C5CEE0', 400: '#3C5A8A', 500: '#0B1D3A', 600: '#091730', 700: '#071225' },
-                        gold:   { 50: '#FDF8EE', 100: '#F9EDCC', 300: '#E8C46D', 400: '#C8993C', 500: '#B5882F', 600: '#9A7226' },
-                        cream:  { 50: '#FEFDFB', 100: '#FAF6EF', 200: '#F2EBE0', 300: '#E8DFD0' },
-                        rust:   { 400: '#B85A3A', 500: '#9B4D2B', 600: '#7F3E22' },
-                        sage:   { 400: '#6D8A56', 500: '#5A7247', 600: '#4A5E3B' },
-                    },
-                    fontFamily: {
-                        display: ['Bitter', 'Georgia', 'serif'],
-                        body:    ['DM Sans', 'system-ui', 'sans-serif'],
-                    },
-                }
-            }
-        }
-    </script>
+/* ── HEADER: 56px, sticky ── */
+.hdr{position:sticky;top:0;z-index:50;background:var(--navy);padding:0 16px;height:56px;display:flex;align-items:center;justify-content:space-between}
+.logo{display:flex;align-items:center;gap:8px}
+.logo-box{width:32px;height:32px;background:var(--gold);border-radius:8px;display:flex;align-items:center;justify-content:center}
+.logo-box svg{width:18px;height:18px;stroke:var(--navy);fill:none;stroke-width:2.2}
+.logo-t{font-family:'Bitter',serif;font-weight:800;font-size:15px;color:var(--gold);letter-spacing:.04em}
+.logo-t span{color:var(--cream2);font-weight:600}
+/* Phone: hamburger visible, desktop nav hidden */
+.mbtn{width:48px;height:48px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;background:0;border:0;cursor:pointer}
+.mbtn i{display:block;width:22px;height:2px;background:var(--gold);border-radius:2px}
+.dnav{display:none}
+.mnav{max-height:0;overflow:hidden;transition:max-height .3s;background:var(--navy);padding:0 16px}
+.mnav.open{max-height:300px}
+.mnav a{display:block;padding:14px 12px;color:var(--cream2);font-weight:600;font-size:14px;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid rgba(200,153,60,.08)}
+.mnav a.on{color:var(--gold)}
 
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bitter:wght@500;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+/* ── HERO ── */
+.hero{background:var(--navy);padding:28px 16px 36px;text-align:center}
+.hero-tag{color:var(--gold);font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.15em;margin-bottom:8px}
+.hero h1{color:var(--cream);font-size:24px;font-weight:800;line-height:1.25;margin-bottom:8px}
+.hero p{color:rgba(250,246,239,.55);font-size:14px;line-height:1.6}
+.stats{display:flex;flex-wrap:wrap;justify-content:center;gap:16px;margin-top:20px}
+.stat{text-align:center;min-width:65px}
+.stat b{display:block;font-family:'Bitter',serif;font-weight:800;color:var(--gold);font-size:20px;line-height:1}
+.stat small{display:block;color:rgba(250,246,239,.35);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-top:3px}
 
-    <style>
-        /* Grain overlay */
-        body::after {
-            content: '';
-            position: fixed;
-            inset: 0;
-            pointer-events: none;
-            z-index: 9999;
-            opacity: 0.025;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-        }
+/* ── FILTERS: stacked on phone ── */
+.filters{background:var(--white);border-bottom:1px solid var(--cream3);padding:12px 16px;position:sticky;top:56px;z-index:40}
+.frow{display:flex;flex-direction:column;gap:8px}
+.flbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:rgba(11,29,58,.3);margin-bottom:2px}
+.fin{width:100%;padding:12px;font-size:14px;border:1px solid var(--cream3);border-radius:var(--r);background:var(--white);color:var(--navy);font-family:inherit;-webkit-appearance:none;appearance:none}
+.fin:focus{outline:0;border-color:var(--gold);box-shadow:0 0 0 3px rgba(200,153,60,.15)}
+select.fin{background-image:url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%228%22%3E%3Cpath d=%221 1l5 5 5-5%22 stroke=%22%230B1D3A%22 stroke-width=%221.5%22 fill=%22none%22/%3E%3C/svg%3E');background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
+.fbtn{width:100%;padding:14px;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;background:var(--gold);color:var(--navy);border:0;border-radius:var(--r);cursor:pointer;font-family:inherit;min-height:48px}
+.swrap{position:relative}
+.swrap svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:16px;height:16px;stroke:rgba(11,29,58,.25);fill:none;stroke-width:2}
+.swrap .fin{padding-left:36px}
 
-        /* Card entrance */
-        @keyframes cardIn {
-            from { opacity: 0; transform: translateY(24px); }
-            to   { opacity: 1; transform: translateY(0); }
-        }
-        .card-enter {
-            opacity: 0;
-            animation: cardIn 0.5s ease-out forwards;
-        }
+/* ── CARDS: single column ── */
+.main{padding:16px}
+.rbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.rbar h2{font-size:17px;font-weight:700}
+.rbar .cnt{font-size:12px;font-weight:600;color:rgba(11,29,58,.3)}
+.grid{display:flex;flex-direction:column;gap:12px}
+.card{background:var(--white);border-radius:var(--r);border:1px solid rgba(232,223,208,.5);overflow:hidden;display:block;opacity:0;animation:ci .35s ease-out forwards}
+@keyframes ci{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.card:active{box-shadow:0 2px 12px rgba(11,29,58,.07)}
+.ca{height:4px;background:linear-gradient(90deg,var(--gold),rgba(200,153,60,.3),var(--gold))}
+.cb{padding:14px 16px}
+.cn{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:4px}
+.cn h3{font-family:'Bitter',serif;font-weight:700;font-size:15px;line-height:1.3;flex:1;min-width:0}
+.vb{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:5px;background:rgba(90,114,71,.1);color:var(--sage);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;flex-shrink:0}
+.vb svg{width:11px;height:11px;fill:currentColor}
+.cl{display:flex;align-items:center;gap:5px;font-size:13px;color:rgba(11,29,58,.4);margin-bottom:8px}
+.cl svg{width:13px;height:13px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:2}
+.cp{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:16px;background:var(--cream);font-size:11px;font-weight:600;color:rgba(11,29,58,.55);margin-bottom:12px}
+.cp .d{width:7px;height:7px;border-radius:50%}
+.de{background:var(--sage)}.dr{background:var(--rust)}.dm{background:var(--slate)}.df{background:#8B6E4E}.da{background:var(--gold)}
+.cs{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;border-top:1px solid var(--cream2);padding-top:10px;text-align:center}
+.cs .v{font-family:'Bitter',serif;font-weight:700;font-size:16px;line-height:1}
+.cs .s{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:rgba(11,29,58,.3);margin-top:1px}
+.cs .x{font-size:8px;color:rgba(11,29,58,.18);margin-top:1px}
+.cf{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;background:rgba(250,246,239,.4);border-top:1px solid rgba(232,223,208,.35)}
+.cf span{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:rgba(11,29,58,.2)}
+.cf svg{width:16px;height:16px;stroke:var(--gold);fill:none;stroke-width:2.5}
 
-        /* Shimmer loading */
-        @keyframes shimmer {
-            0%   { background-position: -400px 0; }
-            100% { background-position: 400px 0; }
-        }
-        .shimmer {
-            background: linear-gradient(90deg, #E8DFD0 25%, #F2EBE0 50%, #E8DFD0 75%);
-            background-size: 800px 100%;
-            animation: shimmer 1.5s infinite;
-            border-radius: 8px;
-        }
+/* Shimmer */
+.sh{height:180px;background:linear-gradient(90deg,var(--cream2) 25%,var(--cream) 50%,var(--cream2) 75%);background-size:600px 100%;animation:sm 1.2s infinite;border-radius:var(--r)}
+@keyframes sm{0%{background-position:-300px 0}100%{background-position:300px 0}}
 
-        /* Scrollbar */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #FAF6EF; }
-        ::-webkit-scrollbar-thumb { background: #C8993C; border-radius: 4px; }
+/* Empty */
+.emp{text-align:center;padding:48px 16px;display:none}
+.emp h3{font-size:15px;color:rgba(11,29,58,.4);margin-bottom:4px}
+.emp p{font-size:13px;color:rgba(11,29,58,.2)}
 
-        /* Stat counter */
-        @keyframes countPop {
-            0%   { transform: scale(0.7); opacity: 0; }
-            60%  { transform: scale(1.05); }
-            100% { transform: scale(1); opacity: 1; }
-        }
-        .stat-pop {
-            animation: countPop 0.4s ease-out forwards;
-        }
+/* Footer */
+.ft{background:var(--navy);padding:28px 16px;text-align:center}
+.ft .br{font-family:'Bitter',serif;font-weight:700;color:var(--gold);font-size:15px;margin-bottom:3px}
+.ft .sb{font-size:12px;color:rgba(250,246,239,.3)}
+.ft-l{display:flex;justify-content:center;gap:16px;margin-top:10px}
+.ft-l a{font-size:11px;color:rgba(250,246,239,.18)}
+.ft .cp2{font-size:10px;color:rgba(250,246,239,.1);margin-top:16px}
 
-        /* Mobile menu slide */
-        .mobile-nav { max-height: 0; overflow: hidden; transition: max-height 0.35s ease; }
-        .mobile-nav.open { max-height: 320px; }
+/* ═══ TABLET: 640px+ ═══ */
+@media(min-width:640px){
+  .hdr{padding:0 24px}
+  .hero{padding:36px 24px 44px}
+  .hero h1{font-size:30px}
+  .filters{padding:12px 24px}
+  .frow{flex-direction:row;align-items:flex-end}
+  .frow>*{flex:1}
+  .fbtn{width:auto;flex:0 0 auto;padding:12px 24px}
+  .main{padding:20px 24px 40px}
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+  .stat b{font-size:26px}
+  .ft{padding:36px 24px}
+}
 
-        /* Arena type dot colors */
-        .dot-equine       { background: #5A7247; }
-        .dot-agricultural { background: #C8993C; }
-        .dot-multi-use    { background: #3C5A8A; }
-        .dot-rodeo        { background: #9B4D2B; }
-        .dot-fairgrounds  { background: #8B6E4E; }
-    </style>
+/* ═══ DESKTOP: 1024px+ ═══ */
+@media(min-width:1024px){
+  .mbtn{display:none}
+  .dnav{display:flex;align-items:center;gap:4px}
+  .dnav a{padding:8px 14px;color:var(--cream2);font-weight:600;font-size:13px;text-transform:uppercase;letter-spacing:.06em;border-bottom:2px solid transparent;transition:all .2s}
+  .dnav a:hover{color:var(--gold);border-color:rgba(200,153,60,.3)}
+  .dnav a.on{color:var(--gold);border-color:var(--gold)}
+  .dnav .bd{margin-left:10px;padding:8px 16px;background:rgba(200,153,60,.1);color:var(--gold);border-radius:8px;border-bottom:0}
+  .hdr{padding:0 24px}.hero{padding:44px 24px 52px}.hero h1{font-size:38px}
+  .filters{padding:12px 24px}.main{padding:24px 24px 48px}
+  .hdr>*,.hero>div,.filters>div,.main,.ft>div{max-width:1200px;margin-left:auto;margin-right:auto}
+  .grid{grid-template-columns:repeat(3,1fr);gap:16px}
+}
+</style>
 </head>
+<body>
 
-<body class="bg-cream-100 text-navy-500 font-body min-h-screen">
-
-<!-- ════════════════════════════════════════════════════════════
-     HEADER
-     ════════════════════════════════════════════════════════════ -->
-<header class="bg-navy-500 sticky top-0 z-50 shadow-lg shadow-navy-500/20">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6">
-        <div class="flex items-center justify-between h-16">
-
-            <!-- Logo -->
-            <a href="index.html" class="flex items-center gap-2.5 group">
-                <div class="w-9 h-9 rounded-lg bg-gold-400 flex items-center justify-center shadow-md shadow-gold-400/30 group-hover:shadow-gold-400/50 transition-shadow">
-                    <svg class="w-5 h-5 text-navy-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21"/>
-                    </svg>
-                </div>
-                <div>
-                    <span class="font-display font-800 text-gold-400 text-lg tracking-wide leading-none">ARENA</span>
-                    <span class="font-display font-600 text-cream-200 text-lg tracking-wide leading-none ml-1">NETWORK</span>
-                </div>
-            </a>
-
-            <!-- Desktop Nav -->
-            <nav class="hidden md:flex items-center gap-1">
-                <a href="index.html" class="px-3 py-2 text-sm font-semibold text-gold-400 border-b-2 border-gold-400 tracking-wide uppercase">Arenas</a>
-                <a href="calendar.html" class="px-3 py-2 text-sm font-semibold text-cream-300 hover:text-gold-300 border-b-2 border-transparent hover:border-gold-300/40 transition-all tracking-wide uppercase">Calendar</a>
-                <a href="vendor.html" class="px-3 py-2 text-sm font-semibold text-cream-300 hover:text-gold-300 border-b-2 border-transparent hover:border-gold-300/40 transition-all tracking-wide uppercase">Vendors</a>
-                <a href="dashboard/dashboard.html" class="ml-3 px-4 py-2.5 text-sm font-semibold bg-gold-400/10 text-gold-400 rounded-lg hover:bg-gold-400/20 transition-colors tracking-wide uppercase">Dashboard</a>
-            </nav>
-
-            <!-- Mobile Hamburger -->
-            <button id="menuBtn" class="md:hidden flex flex-col gap-[5px] p-2 group" aria-label="Menu">
-                <span class="w-6 h-0.5 bg-gold-400 rounded transition-transform group-hover:translate-x-0.5"></span>
-                <span class="w-5 h-0.5 bg-gold-300 rounded transition-transform group-hover:translate-x-1"></span>
-                <span class="w-6 h-0.5 bg-gold-400 rounded transition-transform group-hover:translate-x-0.5"></span>
-            </button>
-        </div>
-
-        <!-- Mobile Menu -->
-        <div id="mobileNav" class="mobile-nav md:hidden border-t border-gold-400/10">
-            <div class="py-3 space-y-1">
-                <a href="index.html" class="block px-4 py-2.5 text-gold-400 font-semibold bg-gold-400/10 rounded-lg text-sm uppercase tracking-wide">Arenas</a>
-                <a href="calendar.html" class="block px-4 py-2.5 text-cream-300 font-semibold hover:bg-gold-400/10 rounded-lg text-sm uppercase tracking-wide transition-colors">Calendar</a>
-                <a href="vendor.html" class="block px-4 py-2.5 text-cream-300 font-semibold hover:bg-gold-400/10 rounded-lg text-sm uppercase tracking-wide transition-colors">Vendors</a>
-                <a href="dashboard/dashboard.html" class="block px-4 py-2.5 text-cream-300 font-semibold hover:bg-gold-400/10 rounded-lg text-sm uppercase tracking-wide transition-colors">Dashboard</a>
-            </div>
-        </div>
-    </div>
+<!-- HEADER -->
+<header class="hdr">
+  <a href="index.html" class="logo">
+    <div class="logo-box"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21"/></svg></div>
+    <div class="logo-t">ARENA <span>NETWORK</span></div>
+  </a>
+  <nav class="dnav">
+    <a href="index.html" class="on">Arenas</a>
+    <a href="calendar.html">Calendar</a>
+    <a href="vendor.html">Vendors</a>
+    <a href="dashboard/dashboard.html" class="bd">Dashboard</a>
+  </nav>
+  <button class="mbtn" id="mb" aria-label="Menu"><i></i><i></i><i></i></button>
 </header>
+<nav class="mnav" id="mn">
+  <a href="index.html" class="on">Arenas</a>
+  <a href="calendar.html">Calendar</a>
+  <a href="vendor.html">Vendors</a>
+  <a href="dashboard/dashboard.html">Dashboard</a>
+</nav>
 
-<!-- ════════════════════════════════════════════════════════════
-     HERO
-     ════════════════════════════════════════════════════════════ -->
-<section class="relative overflow-hidden bg-navy-500">
-    <!-- Pattern -->
-    <div class="absolute inset-0 opacity-[0.04]" style="background-image: url('data:image/svg+xml,%3Csvg width=&quot;40&quot; height=&quot;40&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot;%3E%3Cpath d=&quot;M20 0v40M0 20h40&quot; stroke=&quot;%23C8993C&quot; stroke-width=&quot;0.5&quot;/%3E%3C/svg%3E');"></div>
-    <!-- Gold accent bar -->
-    <div class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-gold-400 to-transparent"></div>
-
-    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-16 text-center">
-        <p class="text-gold-400 font-semibold text-xs tracking-[0.2em] uppercase mb-3">League of Agricultural &amp; Equine Centers</p>
-        <h1 class="font-display font-800 text-cream-100 text-3xl sm:text-4xl lg:text-5xl leading-tight mb-4">
-            Arena Directory
-        </h1>
-        <p class="text-cream-300/80 text-base sm:text-lg max-w-xl mx-auto leading-relaxed">
-            Find equine centers, agricultural arenas, rodeo grounds, and fairgrounds nationwide.
-        </p>
-
-        <!-- Stats bar -->
-        <div class="mt-8 flex flex-wrap justify-center gap-6 sm:gap-10">
-            <div class="text-center">
-                <div id="statTotal" class="font-display font-800 text-gold-400 text-2xl sm:text-3xl leading-none">—</div>
-                <div class="text-cream-300/60 text-xs font-semibold uppercase tracking-wider mt-1">Arenas</div>
-            </div>
-            <div class="w-px h-10 bg-cream-300/10 hidden sm:block"></div>
-            <div class="text-center">
-                <div id="statStates" class="font-display font-800 text-gold-400 text-2xl sm:text-3xl leading-none">—</div>
-                <div class="text-cream-300/60 text-xs font-semibold uppercase tracking-wider mt-1">States</div>
-            </div>
-            <div class="w-px h-10 bg-cream-300/10 hidden sm:block"></div>
-            <div class="text-center">
-                <div id="statStalls" class="font-display font-800 text-gold-400 text-2xl sm:text-3xl leading-none">—</div>
-                <div class="text-cream-300/60 text-xs font-semibold uppercase tracking-wider mt-1">Total Stalls</div>
-            </div>
-            <div class="w-px h-10 bg-cream-300/10 hidden sm:block"></div>
-            <div class="text-center">
-                <div id="statRV" class="font-display font-800 text-gold-400 text-2xl sm:text-3xl leading-none">—</div>
-                <div class="text-cream-300/60 text-xs font-semibold uppercase tracking-wider mt-1">RV Spaces</div>
-            </div>
-        </div>
-    </div>
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-tag">League of Agricultural &amp; Equine Centers</div>
+  <h1>Arena Directory</h1>
+  <p>Find equine centers, agricultural arenas, rodeo grounds, and fairgrounds nationwide.</p>
+  <div class="stats">
+    <div class="stat"><b id="sT">—</b><small>Arenas</small></div>
+    <div class="stat"><b id="sS">—</b><small>States</small></div>
+    <div class="stat"><b id="sL">—</b><small>Stalls</small></div>
+    <div class="stat"><b id="sR">—</b><small>RV Spaces</small></div>
+  </div>
 </section>
 
-<!-- ════════════════════════════════════════════════════════════
-     FILTERS
-     ════════════════════════════════════════════════════════════ -->
-<section class="bg-cream-50 border-b border-cream-300/60 sticky top-16 z-40 shadow-sm">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3">
-        <div class="flex flex-col sm:flex-row gap-3 items-stretch sm:items-end">
-            <!-- Search -->
-            <div class="flex-1 min-w-0">
-                <label class="text-[10px] font-bold uppercase tracking-wider text-navy-500/40 mb-1 block">Search</label>
-                <div class="relative">
-                    <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-navy-500/30" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
-                    </svg>
-                    <input id="searchInput" type="text" placeholder="Arena name or city..."
-                        class="w-full pl-10 pr-4 py-2.5 bg-white border border-cream-300 rounded-lg text-sm font-medium text-navy-500 placeholder:text-navy-500/30 focus:outline-none focus:ring-2 focus:ring-gold-400/30 focus:border-gold-400 transition-all">
-                </div>
-            </div>
-
-            <!-- State Filter -->
-            <div class="w-full sm:w-40">
-                <label class="text-[10px] font-bold uppercase tracking-wider text-navy-500/40 mb-1 block">State</label>
-                <select id="stateFilter"
-                    class="w-full py-2.5 px-3 bg-white border border-cream-300 rounded-lg text-sm font-medium text-navy-500 focus:outline-none focus:ring-2 focus:ring-gold-400/30 focus:border-gold-400 appearance-none transition-all"
-                    style="background-image: url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%228%22%3E%3Cpath d=%221 1l5 5 5-5%22 stroke=%22%230B1D3A%22 stroke-width=%221.5%22 fill=%22none%22/%3E%3C/svg%3E'); background-repeat: no-repeat; background-position: right 12px center;">
-                    <option value="">All States</option>
-                </select>
-            </div>
-
-            <!-- Type Filter -->
-            <div class="w-full sm:w-44">
-                <label class="text-[10px] font-bold uppercase tracking-wider text-navy-500/40 mb-1 block">Type</label>
-                <select id="typeFilter"
-                    class="w-full py-2.5 px-3 bg-white border border-cream-300 rounded-lg text-sm font-medium text-navy-500 focus:outline-none focus:ring-2 focus:ring-gold-400/30 focus:border-gold-400 appearance-none transition-all"
-                    style="background-image: url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%228%22%3E%3Cpath d=%221 1l5 5 5-5%22 stroke=%22%230B1D3A%22 stroke-width=%221.5%22 fill=%22none%22/%3E%3C/svg%3E'); background-repeat: no-repeat; background-position: right 12px center;">
-                    <option value="">All Types</option>
-                    <option value="equine">Equine</option>
-                    <option value="agricultural">Agricultural</option>
-                    <option value="multi-use">Multi-Use</option>
-                    <option value="rodeo">Rodeo</option>
-                    <option value="fairgrounds">Fairgrounds</option>
-                </select>
-            </div>
-
-            <!-- Search Button -->
-            <button onclick="loadArenas()"
-                class="bg-gold-400 hover:bg-gold-500 text-navy-500 font-bold text-sm px-6 py-2.5 rounded-lg transition-colors shadow-sm hover:shadow-md hover:shadow-gold-400/20 uppercase tracking-wider">
-                Search
-            </button>
-        </div>
+<!-- FILTERS -->
+<section class="filters">
+  <div class="frow">
+    <div>
+      <div class="flbl">Search</div>
+      <div class="swrap">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <input id="si" type="text" class="fin" placeholder="Arena name or city...">
+      </div>
     </div>
+    <div>
+      <div class="flbl">State</div>
+      <select id="sf" class="fin"><option value="">All States</option></select>
+    </div>
+    <div>
+      <div class="flbl">Type</div>
+      <select id="tf" class="fin">
+        <option value="">All Types</option>
+        <option value="equine">Equine</option>
+        <option value="agricultural">Agricultural</option>
+        <option value="multi-use">Multi-Use</option>
+        <option value="rodeo">Rodeo</option>
+        <option value="fairgrounds">Fairgrounds</option>
+      </select>
+    </div>
+    <div><button class="fbtn" onclick="load()">Search</button></div>
+  </div>
 </section>
 
-<!-- ════════════════════════════════════════════════════════════
-     ARENA GRID
-     ════════════════════════════════════════════════════════════ -->
-<main class="max-w-7xl mx-auto px-4 sm:px-6 py-8">
-
-    <!-- Result header -->
-    <div class="flex items-center justify-between mb-6">
-        <h2 id="resultHeading" class="font-display font-700 text-xl text-navy-500">Loading arenas...</h2>
-        <div id="resultCount" class="text-sm font-semibold text-navy-500/40 tracking-wide"></div>
-    </div>
-
-    <!-- Grid -->
-    <div id="arenaGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-        <!-- Shimmer placeholders -->
-        <div class="shimmer h-60 rounded-xl"></div>
-        <div class="shimmer h-60 rounded-xl hidden sm:block"></div>
-        <div class="shimmer h-60 rounded-xl hidden lg:block"></div>
-        <div class="shimmer h-60 rounded-xl"></div>
-        <div class="shimmer h-60 rounded-xl hidden sm:block"></div>
-        <div class="shimmer h-60 rounded-xl hidden lg:block"></div>
-    </div>
-
-    <!-- Empty State -->
-    <div id="emptyState" class="hidden text-center py-16">
-        <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-cream-200 flex items-center justify-center">
-            <svg class="w-8 h-8 text-navy-500/20" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/>
-            </svg>
-        </div>
-        <h3 class="font-display font-700 text-lg text-navy-500/60 mb-1">No arenas found</h3>
-        <p class="text-sm text-navy-500/40">Try adjusting your search or filters.</p>
-    </div>
+<!-- CONTENT -->
+<main class="main">
+  <div class="rbar">
+    <h2 id="rh">Loading...</h2>
+    <span class="cnt" id="rc"></span>
+  </div>
+  <div class="grid" id="g">
+    <div class="sh"></div><div class="sh"></div><div class="sh"></div>
+  </div>
+  <div class="emp" id="em">
+    <h3>No arenas found</h3>
+    <p>Try adjusting your search or filters.</p>
+  </div>
 </main>
 
-<!-- ════════════════════════════════════════════════════════════
-     FOOTER
-     ════════════════════════════════════════════════════════════ -->
-<footer class="bg-navy-500 mt-8">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-10 text-center">
-        <div class="font-display font-700 text-gold-400 text-lg tracking-wide mb-1">Arena Network</div>
-        <p class="text-cream-300/50 text-sm">League of Agricultural &amp; Equine Centers</p>
-        <div class="mt-4 flex justify-center gap-6 text-xs text-cream-300/30">
-            <a href="calendar.html" class="hover:text-gold-400 transition-colors">Calendar</a>
-            <a href="vendor.html" class="hover:text-gold-400 transition-colors">Vendors</a>
-            <a href="dashboard/dashboard.html" class="hover:text-gold-400 transition-colors">Dashboard</a>
-        </div>
-        <p class="mt-6 text-[11px] text-cream-300/20">&copy; 2026 Arena Network. All rights reserved.</p>
-    </div>
+<!-- FOOTER -->
+<footer class="ft">
+  <div class="br">Arena Network</div>
+  <div class="sb">League of Agricultural &amp; Equine Centers</div>
+  <div class="ft-l">
+    <a href="calendar.html">Calendar</a>
+    <a href="vendor.html">Vendors</a>
+    <a href="dashboard/dashboard.html">Dashboard</a>
+  </div>
+  <div class="cp2">&copy; 2026 Arena Network</div>
 </footer>
 
-<!-- ════════════════════════════════════════════════════════════
-     JAVASCRIPT
-     ════════════════════════════════════════════════════════════ -->
 <script>
-var allArenas = [];
+var A=[],SP=false,T;
+document.getElementById('mb').onclick=function(){document.getElementById('mn').classList.toggle('open')};
+document.getElementById('si').oninput=function(){clearTimeout(T);T=setTimeout(load,400)};
+document.getElementById('si').onkeydown=function(e){if(e.key==='Enter')load()};
+document.getElementById('sf').onchange=load;
+document.getElementById('tf').onchange=load;
+load();
 
-// ── Mobile menu toggle ──
-document.getElementById('menuBtn').addEventListener('click', () => {
-    document.getElementById('mobileNav').classList.toggle('open');
-});
-
-// ── Search on Enter ──
-document.getElementById('searchInput').addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') loadArenas();
-});
-
-// ── Debounced search ──
-var searchTimer;
-document.getElementById('searchInput').addEventListener('input', () => {
-    clearTimeout(searchTimer);
-    searchTimer = setTimeout(loadArenas, 400);
-});
-
-// ── Filter change triggers reload ──
-document.getElementById('stateFilter').addEventListener('change', loadArenas);
-document.getElementById('typeFilter').addEventListener('change', loadArenas);
-
-// ── Load arenas from D1 API ──
-async function loadArenas() {
-    const search = (document.getElementById('searchInput').value || '').trim();
-    const state  = document.getElementById('stateFilter').value;
-    const type   = document.getElementById('typeFilter').value;
-
-    const params = new URLSearchParams();
-    if (search) params.set('search', search);
-    if (state) params.set('state', state);
-    if (type) params.set('type', type);
-    params.set('limit', '200');
-
-    try {
-        const res = await fetch('/api/arenas?' + params);
-        const data = await res.json();
-        allArenas = data.arenas || [];
-        renderStats(allArenas);
-        renderGrid(allArenas);
-        populateStates(allArenas);
-    } catch (err) {
-        console.error('Failed to load arenas:', err);
-        document.getElementById('arenaGrid').innerHTML = '';
-        document.getElementById('emptyState').classList.remove('hidden');
-        document.getElementById('resultHeading').textContent = 'Error loading arenas';
-    }
+async function load(){
+  var s=document.getElementById('si').value.trim();
+  var st=document.getElementById('sf').value;
+  var ty=document.getElementById('tf').value;
+  var p=new URLSearchParams();
+  if(s)p.set('search',s);if(st)p.set('state',st);if(ty)p.set('type',ty);p.set('limit','200');
+  try{
+    var r=await fetch('/api/arenas?'+p);var d=await r.json();A=d.arenas||[];
+    stats(A);grid(A);pops(A);
+  }catch(e){
+    document.getElementById('g').innerHTML='';
+    document.getElementById('em').style.display='block';
+    document.getElementById('rh').textContent='Error loading';
+  }
 }
 
-// ── Render stats in hero ──
-function renderStats(arenas) {
-    const total  = arenas.length;
-    const states = new Set(arenas.map(a => a.state).filter(Boolean)).size;
-    const stalls = arenas.reduce((s, a) => s + (parseInt(a.stall_count) || 0), 0);
-    const rv     = arenas.reduce((s, a) => s + (parseInt(a.rv_spaces) || 0), 0);
-
-    animateStat('statTotal',  total);
-    animateStat('statStates', states);
-    animateStat('statStalls', stalls);
-    animateStat('statRV',     rv);
+function stats(a){
+  document.getElementById('sT').textContent=a.length.toLocaleString();
+  document.getElementById('sS').textContent=new Set(a.map(function(x){return x.state}).filter(Boolean)).size;
+  document.getElementById('sL').textContent=a.reduce(function(s,x){return s+(parseInt(x.stall_count)||0)},0).toLocaleString();
+  document.getElementById('sR').textContent=a.reduce(function(s,x){return s+(parseInt(x.rv_spaces)||0)},0).toLocaleString();
 }
 
-function animateStat(id, target) {
-    const el = document.getElementById(id);
-    el.classList.remove('stat-pop');
-    void el.offsetWidth; // reflow
-    el.textContent = target.toLocaleString();
-    el.classList.add('stat-pop');
+function grid(a){
+  var g=document.getElementById('g'),em=document.getElementById('em');
+  if(!a.length){g.innerHTML='';em.style.display='block';document.getElementById('rh').textContent='Arenas';document.getElementById('rc').textContent='0';return}
+  em.style.display='none';
+  document.getElementById('rh').textContent='Arenas';
+  document.getElementById('rc').textContent=a.length+' result'+(a.length!==1?'s':'');
+  g.innerHTML=a.map(function(a,i){
+    var t=(parseInt(a.indoor_arenas)||0)+(parseInt(a.outdoor_arenas)||0);
+    var n=parseInt(a.indoor_arenas)||0,o=parseInt(a.outdoor_arenas)||0;
+    var sl=parseInt(a.stall_count)||0,rv=parseInt(a.rv_spaces)||0;
+    var tp=cap(a.arena_type||'equine');
+    var dc='d'+({equine:'e',rodeo:'r','multi-use':'m',fairgrounds:'f',agricultural:'a'}[a.arena_type]||'e');
+    var dl=Math.min(i*.04,.5);
+    return '<a href="arena.html?id='+E(a.slug)+'" class="card" style="animation-delay:'+dl+'s">'+
+      '<div class="ca"></div><div class="cb">'+
+      '<div class="cn"><h3>'+E(a.name)+'</h3>'+(a.is_verified?'<span class="vb"><svg viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.403 12.652a3 3 0 0 0 0-5.304 3 3 0 0 0-3.75-3.751 3 3 0 0 0-5.305 0 3 3 0 0 0-3.751 3.75 3 3 0 0 0 0 5.305 3 3 0 0 0 3.75 3.751 3 3 0 0 0 5.305 0 3 3 0 0 0 3.751-3.75Zm-2.546-4.46a.75.75 0 0 0-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 1 0-1.06 1.061l2.5 2.5a.75.75 0 0 0 1.137-.089l4-5.5Z" clip-rule="evenodd"/></svg>Verified</span>':'')+'</div>'+
+      '<div class="cl"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/><path d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 0 1 15 0Z"/></svg>'+E(a.city||'')+((a.city&&a.state)?', ':'')+E(a.state||'')+'</div>'+
+      '<div class="cp"><span class="d '+dc+'"></span>'+tp+'</div>'+
+      '<div class="cs">'+
+        '<div><div class="v">'+t+'</div><div class="s">Arena'+(t!==1?'s':'')+'</div><div class="x">'+(n>0?n+' in':'')+(n>0&&o>0?' / ':'')+(o>0?o+' out':'')+'</div></div>'+
+        '<div><div class="v">'+(sl>0?sl.toLocaleString():'—')+'</div><div class="s">Stalls</div></div>'+
+        '<div><div class="v">'+(rv>0?rv.toLocaleString():'—')+'</div><div class="s">RV</div></div>'+
+      '</div></div>'+
+      '<div class="cf"><span>View Details</span><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"/></svg></div></a>';
+  }).join('');
 }
 
-// ── Render arena cards ──
-function renderGrid(arenas) {
-    const grid   = document.getElementById('arenaGrid');
-    const empty  = document.getElementById('emptyState');
-    const heading = document.getElementById('resultHeading');
-    const count  = document.getElementById('resultCount');
-
-    if (arenas.length === 0) {
-        grid.innerHTML = '';
-        empty.classList.remove('hidden');
-        heading.textContent = 'Arenas';
-        count.textContent = '0 results';
-        return;
-    }
-
-    empty.classList.add('hidden');
-    heading.textContent = 'Arenas';
-    count.textContent = `${arenas.length} result${arenas.length !== 1 ? 's' : ''}`;
-
-    grid.innerHTML = arenas.map((a, i) => {
-        const totalArenas   = (parseInt(a.indoor_arenas) || 0) + (parseInt(a.outdoor_arenas) || 0);
-        const indoorCount   = parseInt(a.indoor_arenas) || 0;
-        const outdoorCount  = parseInt(a.outdoor_arenas) || 0;
-        const stallCount    = parseInt(a.stall_count) || 0;
-        const rvSpaces      = parseInt(a.rv_spaces) || 0;
-        const typeLabel     = capitalize(a.arena_type || 'equine');
-        const dotClass      = 'dot-' + (a.arena_type || 'equine').replace(/\s+/g, '-');
-        const delay         = Math.min(i * 0.06, 0.6);
-
-        return `
-        <a href="arena.html?id=${a.slug}"
-           class="card-enter group block bg-white rounded-xl border border-cream-300/60 overflow-hidden hover:shadow-lg hover:shadow-navy-500/8 hover:-translate-y-1 transition-all duration-300"
-           style="animation-delay: ${delay}s;">
-
-            <!-- Top accent -->
-            <div class="h-1.5 bg-gradient-to-r from-gold-400 via-gold-300 to-gold-400 opacity-80 group-hover:opacity-100 transition-opacity"></div>
-
-            <div class="p-5">
-                <!-- Name + Badge -->
-                <div class="flex items-start justify-between gap-2 mb-3">
-                    <h3 class="font-display font-700 text-base leading-snug text-navy-500 group-hover:text-gold-500 transition-colors line-clamp-2">
-                        ${escHTML(a.name)}
-                    </h3>
-                    ${a.is_verified
-                        ? `<span class="flex-shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-sage-500/10 text-sage-600 text-[10px] font-bold uppercase tracking-wider">
-                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.403 12.652a3 3 0 0 0 0-5.304 3 3 0 0 0-3.75-3.751 3 3 0 0 0-5.305 0 3 3 0 0 0-3.751 3.75 3 3 0 0 0 0 5.305 3 3 0 0 0 3.75 3.751 3 3 0 0 0 5.305 0 3 3 0 0 0 3.751-3.75Zm-2.546-4.46a.75.75 0 0 0-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 1 0-1.06 1.061l2.5 2.5a.75.75 0 0 0 1.137-.089l4-5.5Z" clip-rule="evenodd"/></svg>
-                            Verified</span>`
-                        : ''
-                    }
-                </div>
-
-                <!-- Location -->
-                <div class="flex items-center gap-1.5 text-sm text-navy-500/50 mb-4">
-                    <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 0 1 15 0Z"/>
-                    </svg>
-                    <span class="font-medium">${escHTML(a.city || '')}${a.city && a.state ? ', ' : ''}${escHTML(a.state || '')}</span>
-                </div>
-
-                <!-- Type pill -->
-                <div class="flex items-center gap-2 mb-4">
-                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-cream-200/60 text-xs font-semibold text-navy-500/70">
-                        <span class="w-2 h-2 rounded-full ${dotClass}"></span>
-                        ${typeLabel}
-                    </span>
-                </div>
-
-                <!-- Stats row -->
-                <div class="border-t border-cream-300/50 pt-3.5 grid grid-cols-3 gap-2 text-center">
-                    <div>
-                        <div class="font-display font-700 text-lg text-navy-500 leading-none">${totalArenas}</div>
-                        <div class="text-[10px] font-semibold uppercase tracking-wider text-navy-500/35 mt-0.5">
-                            Arena${totalArenas !== 1 ? 's' : ''}
-                        </div>
-                        <div class="text-[9px] text-navy-500/25 mt-0.5">
-                            ${indoorCount > 0 ? indoorCount + ' in' : ''}${indoorCount > 0 && outdoorCount > 0 ? ' / ' : ''}${outdoorCount > 0 ? outdoorCount + ' out' : ''}
-                        </div>
-                    </div>
-                    <div>
-                        <div class="font-display font-700 text-lg text-navy-500 leading-none">${stallCount > 0 ? stallCount.toLocaleString() : '—'}</div>
-                        <div class="text-[10px] font-semibold uppercase tracking-wider text-navy-500/35 mt-0.5">Stalls</div>
-                    </div>
-                    <div>
-                        <div class="font-display font-700 text-lg text-navy-500 leading-none">${rvSpaces > 0 ? rvSpaces.toLocaleString() : '—'}</div>
-                        <div class="text-[10px] font-semibold uppercase tracking-wider text-navy-500/35 mt-0.5">RV</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Card footer -->
-            <div class="px-5 py-3 bg-cream-100/50 border-t border-cream-300/40 flex items-center justify-between">
-                <span class="text-xs font-semibold text-navy-500/30 uppercase tracking-wider">View Details</span>
-                <svg class="w-4 h-4 text-gold-400 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"/>
-                </svg>
-            </div>
-        </a>
-        `;
-    }).join('');
+function pops(a){
+  if(SP)return;var s={},l=[];
+  a.forEach(function(x){if(x.state&&!s[x.state]){s[x.state]=1;l.push(x.state)}});
+  l.sort();if(!l.length)return;SP=true;
+  var el=document.getElementById('sf');
+  l.forEach(function(v){var o=document.createElement('option');o.value=v;o.textContent=v;el.appendChild(o)});
 }
 
-// ── Populate state dropdown (once) ──
-var statesPopulated = false;
-function populateStates(arenas) {
-    if (statesPopulated) return;
-    const states = [...new Set(arenas.map(a => a.state).filter(Boolean))].sort();
-    if (states.length === 0) return;
-    statesPopulated = true;
-
-    const sel = document.getElementById('stateFilter');
-    states.forEach(s => {
-        const opt = document.createElement('option');
-        opt.value = s;
-        opt.textContent = s;
-        sel.appendChild(opt);
-    });
-}
-
-// ── Helpers ──
-function capitalize(str) {
-    if (!str) return '';
-    return str.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join('-');
-}
-
-function escHTML(str) {
-    if (!str) return '';
-    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-// ── Init ──
-loadArenas();
+function cap(s){return s?s.split('-').map(function(w){return w.charAt(0).toUpperCase()+w.slice(1)}).join('-'):''}
+function E(s){return s?String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'):''}
 </script>
-
 </body>
 </html>
