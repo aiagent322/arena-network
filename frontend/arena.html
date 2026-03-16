@@ -270,37 +270,15 @@ async function loadArena() {
     if (!id) { showError(); return; }
 
     try {
-        const res = await fetch('/api/arenas?detail=' + encodeURIComponent(id));
-        // The arenas function returns detail when path has id
-        // Use direct URL construction
-        const detailRes = await fetch('/api/arenas?' + new URLSearchParams({slug: id, detail: '1'}));
-        // Actually, need to get arena from list then build detail
-        const listRes = await fetch('/api/arenas?search=' + encodeURIComponent(id) + '&limit=200');
-        const listData = await listRes.json();
-        const arena = (listData.arenas || []).find(a => a.slug === id || a.id === id);
-        if (!arena) { showError(); return; }
+        // Fetch arena detail with related data
+        const res = await fetch('/api/arenas?slug=' + encodeURIComponent(id));
+        if (!res.ok) { showError(); return; }
 
-        // Get events for this arena
-        const evtRes = await fetch('/api/events?arena_id=' + arena.id + '&approved=true&limit=50');
-        const evtData = await evtRes.json();
+        const data = await res.json();
+        if (data.error) { showError(); return; }
 
-        // Get vendors
-        const vndRes = await fetch('/api/vendors?arena_id=' + arena.id);
-        const vndData = await vndRes.json();
-
-        // Get sponsors
-        const spnRes = await fetch('/api/sponsors?arena_id=' + arena.id);
-        const spnData = await spnRes.json();
-
-        // Get news
-        const newsRes = await fetch('/api/news?arena_id=' + arena.id + '&published=true');
-        const newsJson = await newsRes.json();
-        newsData = newsJson.news || [];
-
-        arenaData = arena;
-        arenaData.upcoming_events = evtData.events || [];
-        arenaData.vendors = vndData.vendors || [];
-        arenaData.sponsors = spnData.sponsors || [];
+        arenaData = data;
+        newsData = data.news || [];
 
         renderArena();
     } catch (err) {
