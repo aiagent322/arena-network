@@ -75,10 +75,10 @@
                 </div>
             </a>
             <nav class="hidden md:flex items-center gap-1">
-                <a href="index.html" class="px-3 py-1.5 text-sm font-semibold text-cream-300 hover:text-gold-300 border-b-2 border-transparent hover:border-gold-300/40 transition-all tracking-wide uppercase">Arenas</a>
-                <a href="calendar.html" class="px-3 py-1.5 text-sm font-semibold text-gold-400 border-b-2 border-gold-400 tracking-wide uppercase">Calendar</a>
-                <a href="vendor.html" class="px-3 py-1.5 text-sm font-semibold text-cream-300 hover:text-gold-300 border-b-2 border-transparent hover:border-gold-300/40 transition-all tracking-wide uppercase">Vendors</a>
-                <a href="dashboard/dashboard.html" class="ml-3 px-4 py-1.5 text-sm font-semibold bg-gold-400/10 text-gold-400 rounded-lg hover:bg-gold-400/20 transition-colors tracking-wide uppercase">Dashboard</a>
+                <a href="index.html" class="px-3 py-2 text-sm font-semibold text-cream-300 hover:text-gold-300 border-b-2 border-transparent hover:border-gold-300/40 transition-all tracking-wide uppercase">Arenas</a>
+                <a href="calendar.html" class="px-3 py-2 text-sm font-semibold text-gold-400 border-b-2 border-gold-400 tracking-wide uppercase">Calendar</a>
+                <a href="vendor.html" class="px-3 py-2 text-sm font-semibold text-cream-300 hover:text-gold-300 border-b-2 border-transparent hover:border-gold-300/40 transition-all tracking-wide uppercase">Vendors</a>
+                <a href="dashboard/dashboard.html" class="ml-3 px-4 py-2.5 text-sm font-semibold bg-gold-400/10 text-gold-400 rounded-lg hover:bg-gold-400/20 transition-colors tracking-wide uppercase">Dashboard</a>
             </nav>
             <button id="menuBtn" class="md:hidden flex flex-col gap-[5px] p-2">
                 <span class="w-6 h-0.5 bg-gold-400 rounded"></span><span class="w-5 h-0.5 bg-gold-300 rounded"></span><span class="w-6 h-0.5 bg-gold-400 rounded"></span>
@@ -111,12 +111,12 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3">
         <!-- Month navigation -->
         <div class="flex items-center justify-between mb-3">
-            <button onclick="changeMonth(-1)" class="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-cream-300 bg-white hover:bg-cream-100 text-sm font-semibold text-navy-500/60 hover:text-navy-500 transition-colors">
+            <button onclick="changeMonth(-1)" class="flex items-center gap-1 px-4 py-2.5 rounded-lg border border-cream-300 bg-white hover:bg-cream-100 text-sm font-semibold text-navy-500/60 hover:text-navy-500 transition-colors">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/></svg>
                 Prev
             </button>
             <h2 id="monthLabel" class="font-display font-700 text-lg sm:text-xl text-navy-500"></h2>
-            <button onclick="changeMonth(1)" class="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-cream-300 bg-white hover:bg-cream-100 text-sm font-semibold text-navy-500/60 hover:text-navy-500 transition-colors">
+            <button onclick="changeMonth(1)" class="flex items-center gap-1 px-4 py-2.5 rounded-lg border border-cream-300 bg-white hover:bg-cream-100 text-sm font-semibold text-navy-500/60 hover:text-navy-500 transition-colors">
                 Next
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"/></svg>
             </button>
@@ -160,7 +160,7 @@
         <h3 class="font-display font-700 text-base text-navy-500/50 uppercase tracking-wider">
             Events <span id="eventCount" class="text-navy-500/25"></span>
         </h3>
-        <button onclick="goToday()" class="px-3 py-1 rounded-lg bg-gold-400/10 hover:bg-gold-400/20 text-xs font-bold uppercase tracking-wider text-gold-500 transition-colors">Today</button>
+        <button onclick="goToday()" class="px-4 py-2 rounded-lg bg-gold-400/10 hover:bg-gold-400/20 text-xs font-bold uppercase tracking-wider text-gold-500 transition-colors">Today</button>
     </div>
     <div id="eventList" class="grid gap-3"></div>
     <div id="emptyEvents" class="hidden text-center py-14">

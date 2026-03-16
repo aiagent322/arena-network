@@ -72,9 +72,9 @@
             </div>
             <!-- Period selector -->
             <div class="flex gap-1" id="periodBtns">
-                <button onclick="setPeriod(7)" data-d="7" class="px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-colors">7d</button>
-                <button onclick="setPeriod(30)" data-d="30" class="px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-colors">30d</button>
-                <button onclick="setPeriod(90)" data-d="90" class="px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-colors">90d</button>
+                <button onclick="setPeriod(7)" data-d="7" class="px-4 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors">7d</button>
+                <button onclick="setPeriod(30)" data-d="30" class="px-4 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors">30d</button>
+                <button onclick="setPeriod(90)" data-d="90" class="px-4 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors">90d</button>
             </div>
         </header>
 
@@ -141,7 +141,7 @@ function setPeriod(d){
     period=d;
     document.querySelectorAll('#periodBtns button').forEach(function(b){
         var active=parseInt(b.dataset.d)===d;
-        b.className='px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-colors '+(active?'bg-gold-400/15 text-gold-400':'text-cream-300/20 hover:text-cream-300/40');
+        b.className='px-4 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors '+(active?'bg-gold-400/15 text-gold-400':'text-cream-300/20 hover:text-cream-300/40');
     });
     loadAll();
 }

@@ -442,7 +442,7 @@ async function loadAnalytics(){
     const s=data.summary||{};
 
     M.innerHTML=card(`
-        ${hdr('LLM Usage Analytics',`<div class="flex gap-1">${[7,30,90].map(d=>`<button onclick="reloadAnalytics(${d})" class="px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider ${d===days?'bg-gold-400/15 text-gold-400':'text-cream-300/20 hover:text-cream-300/40'} transition-colors">${d}d</button>`).join('')}</div>`)}
+        ${hdr('LLM Usage Analytics',`<div class="flex gap-1">${[7,30,90].map(d=>`<button onclick="reloadAnalytics(${d})" class="px-3 py-2 rounded-lg text-xs font-bold uppercase tracking-wider ${d===days?'bg-gold-400/15 text-gold-400':'text-cream-300/20 hover:text-cream-300/40'} transition-colors">${d}d</button>`).join('')}</div>`)}
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
             ${statBox(parseInt(s.total_calls||0).toLocaleString(),'API Calls')}
             ${statBox(parseInt(s.total_tokens||0).toLocaleString(),'Total Tokens')}
