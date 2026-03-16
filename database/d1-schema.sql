@@ -184,6 +184,9 @@ CREATE INDEX idx_llm_usage_arena     ON llm_usage(arena_id);
 CREATE INDEX idx_llm_usage_operation ON llm_usage(operation);
 CREATE INDEX idx_llm_usage_timestamp ON llm_usage(timestamp);
 
+-- Fix 5: Added index for news published queries
+CREATE INDEX idx_news_published ON news(is_published, publish_date DESC);
+
 CREATE TABLE scrape_jobs (
     id              TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),
     source_url      TEXT NOT NULL,

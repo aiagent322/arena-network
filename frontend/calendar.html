@@ -165,10 +165,15 @@ function renderList(){
   var sorted=filtE.slice().sort(function(a,b){return a.start_date.localeCompare(b.start_date)});
   el.innerHTML=sorted.map(function(e){
     var d=new Date(e.start_date+'T00:00:00');
+    var venue=e.arena_name||'';
+    var loc=e.arena_city?(e.arena_city+(e.arena_state?', '+e.arena_state:'')):'';
+    var venueHtml=venue;
+    if(venue&&e.arena_slug) venueHtml='<a href="arena.html?id='+E(e.arena_slug)+'" style="color:var(--gold);font-weight:600">'+E(venue)+'</a>';
+    else if(venue) venueHtml=E(venue);
     return '<div class="eitem">'+
       '<div class="edate"><div class="mo">'+MO[d.getMonth()].substring(0,3)+'</div><div class="dy">'+d.getDate()+'</div></div>'+
       '<div class="einfo"><h3>'+E(e.title)+'</h3>'+
-      '<div class="venue">'+(e.arena_name||'')+(e.arena_city?' — '+e.arena_city+(e.arena_state?', '+e.arena_state:''):'')+'</div>'+
+      '<div class="venue">'+venueHtml+(loc?' — '+E(loc):'')+'</div>'+
       (e.discipline?'<span class="disc">'+E(e.discipline)+'</span>':'')+
       '</div></div>';
   }).join('');
