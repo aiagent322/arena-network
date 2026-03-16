@@ -249,8 +249,8 @@
 </footer>
 
 <!-- ═══════════ JAVASCRIPT ═══════════ -->
+<script src="js/data.js"></script>
 <script>
-const API = '';
 var arenaData = null;
 var newsData = [];
 
@@ -265,38 +265,38 @@ function getArenaId() {
     return params.get('id') || params.get('slug') || null;
 }
 
-// ── Load arena ──
-async function loadArena() {
+// ── Load arena from static data ──
+function loadArena() {
     const id = getArenaId();
-    if (!id) {
-        showError();
-        return;
-    }
+    if (!id) { showError(); return; }
 
-    try {
-        const res = await fetch(`${API}/api/arenas/${id}`);
-        if (!res.ok) {
-            showError();
-            return;
-        }
+    // Find arena in static data
+    var arena = (typeof ARENAS !== 'undefined' ? ARENAS : []).find(function(a) {
+        return a.id === id || a.slug === id;
+    });
 
-        arenaData = await res.json();
+    if (!arena) { showError(); return; }
 
-        // Also fetch news for this arena
-        try {
-            const newsRes = await fetch(`${API}/api/news?arena_id=${arenaData.id}&published=true`);
-            const newsJson = await newsRes.json();
-            newsData = newsJson.news || [];
-        } catch (e) {
-            newsData = [];
-        }
+    // Build the arenaData object matching API shape
+    var events = (typeof EVENTS !== 'undefined' ? EVENTS : []).filter(function(e) {
+        return e.arena_slug === arena.slug && e.is_approved;
+    });
+    var vendors = (typeof VENDORS !== 'undefined' ? VENDORS : []).filter(function(v) {
+        return v.arena_slug === arena.slug;
+    });
+    var sponsors = (typeof SPONSORS !== 'undefined' ? SPONSORS : []).filter(function(s) {
+        return s.arena_slug === arena.slug;
+    });
+    newsData = (typeof NEWS !== 'undefined' ? NEWS : []).filter(function(n) {
+        return n.arena_slug === arena.slug && n.is_published;
+    });
 
-        renderArena();
+    arenaData = arena;
+    arenaData.upcoming_events = events;
+    arenaData.vendors = vendors;
+    arenaData.sponsors = sponsors;
 
-    } catch (err) {
-        console.error('Failed to load arena:', err);
-        showError();
-    }
+    renderArena();
 }
 
 function showError() {

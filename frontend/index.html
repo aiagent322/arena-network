@@ -293,9 +293,9 @@
 <!-- ════════════════════════════════════════════════════════════
      JAVASCRIPT
      ════════════════════════════════════════════════════════════ -->
+<script src="js/data.js"></script>
 <script>
-const API = '';
-var allArenas = [];
+var allArenas = (typeof ARENAS !== 'undefined') ? ARENAS : [];
 
 // ── Mobile menu toggle ──
 document.getElementById('menuBtn').addEventListener('click', () => {
@@ -318,33 +318,25 @@ document.getElementById('searchInput').addEventListener('input', () => {
 document.getElementById('stateFilter').addEventListener('change', loadArenas);
 document.getElementById('typeFilter').addEventListener('change', loadArenas);
 
-// ── Load arenas from API ──
-async function loadArenas() {
-    const search = document.getElementById('searchInput').value.trim();
+// ── Load arenas — uses static data, falls back to API ──
+function loadArenas() {
+    const search = (document.getElementById('searchInput').value || '').toLowerCase().trim();
     const state  = document.getElementById('stateFilter').value;
     const type   = document.getElementById('typeFilter').value;
 
-    const params = new URLSearchParams();
-    if (search) params.set('search', search);
-    if (state)  params.set('state', state);
-    if (type)   params.set('type', type);
-    params.set('limit', '100');
+    var filtered = allArenas.filter(function(a) {
+        if (search) {
+            var hay = (a.name + ' ' + a.city + ' ' + a.state + ' ' + (a.address||'')).toLowerCase();
+            if (hay.indexOf(search) === -1) return false;
+        }
+        if (state && a.state !== state) return false;
+        if (type && a.arena_type !== type) return false;
+        return true;
+    });
 
-    try {
-        const res = await fetch(`${API}/api/arenas?${params}`);
-        const data = await res.json();
-        allArenas = data.arenas || [];
-
-        renderStats(allArenas);
-        renderGrid(allArenas);
-        populateStates(allArenas);
-
-    } catch (err) {
-        console.error('Failed to load arenas:', err);
-        document.getElementById('arenaGrid').innerHTML = '';
-        document.getElementById('emptyState').classList.remove('hidden');
-        document.getElementById('resultHeading').textContent = 'Error loading arenas';
-    }
+    renderStats(filtered);
+    renderGrid(filtered);
+    populateStates(allArenas);
 }
 
 // ── Render stats in hero ──

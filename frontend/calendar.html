@@ -192,14 +192,14 @@
 </footer>
 
 <!-- ═══════════ JAVASCRIPT ═══════════ -->
+<script src="js/data.js"></script>
 <script>
-const API = '';
 const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 
 var curYear, curMonth;
-var allEvents = [];       // raw from API for this month range
-var filteredEvents = [];   // after local filters applied
+var allEvents = [];
+var filteredEvents = [];
 var filtersPopulated = false;
 
 // ── Init ──
@@ -227,11 +227,10 @@ function goToday() {
     loadMonth();
 }
 
-// ── Load events for visible calendar range ──
-async function loadMonth() {
+// ── Load events from static data ──
+function loadMonth() {
     document.getElementById('monthLabel').textContent = `${MONTHS[curMonth]} ${curYear}`;
 
-    // Calculate visible date range (pad to full weeks)
     const first = new Date(curYear, curMonth, 1);
     const last  = new Date(curYear, curMonth + 1, 0);
     const startPad = new Date(first); startPad.setDate(startPad.getDate() - first.getDay());
@@ -240,20 +239,28 @@ async function loadMonth() {
     const startStr = toDateStr(startPad);
     const endStr   = toDateStr(endPad);
 
-    try {
-        const res = await fetch(`${API}/api/events?start=${startStr}&end=${endStr}&approved=true&limit=500`);
-        const data = await res.json();
-        allEvents = data.events || [];
+    // Build events from static data with arena info joined
+    var arenaMap = {};
+    (typeof ARENAS !== 'undefined' ? ARENAS : []).forEach(function(a) { arenaMap[a.slug] = a; });
 
-        if (!filtersPopulated) populateFilterOptions(allEvents);
-        applyFilters();
+    allEvents = (typeof EVENTS !== 'undefined' ? EVENTS : []).filter(function(e) {
+        if (!e.is_approved) return false;
+        var sd = e.start_date;
+        var ed = e.end_date || e.start_date;
+        return ed >= startStr && sd <= endStr;
+    }).map(function(e) {
+        var arena = arenaMap[e.arena_slug] || {};
+        return Object.assign({}, e, {
+            id: e.slug,
+            arena_id: e.arena_slug,
+            arena_name: arena.name || null,
+            arena_city: arena.city || null,
+            arena_state: arena.state || null
+        });
+    });
 
-    } catch (err) {
-        console.error('Failed to load events:', err);
-        allEvents = [];
-        filteredEvents = [];
-        renderAll();
-    }
+    if (!filtersPopulated) populateFilterOptions(allEvents);
+    applyFilters();
 }
 
 // ── Populate filter dropdowns (once, from first load) ──
