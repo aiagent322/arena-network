@@ -109,7 +109,7 @@ var arenasList = [];
 // ════════════════════════════════════════════════
 (async function boot() {
     buildNav();
-    try { const r = await fetch(`${API}/api/arenas?limit=200`); const d = await r.json(); arenasList = d.arenas||[]; } catch(e) { arenasList=[]; }
+    try { const r = await fetch(`/api/arenas?limit=200`); const d = await r.json(); arenasList = d.arenas||[]; } catch(e) { arenasList=[]; }
     navigateTo(location.hash.replace('#','') || 'profile');
 })();
 
@@ -182,7 +182,7 @@ function arenaOpts(withAll=false){let o=withAll?[{v:'',l:'All Arenas'}]:[];arena
 async function loadProfile() {
     let stats={arenas:0,events:0,vendors:0,sponsors:0,news:0};
     try{
-        const [eR,vR,sR,nR]=await Promise.all([fetch(`${API}/api/events?limit=1`),fetch(`${API}/api/vendors?limit=1`),fetch(`${API}/api/sponsors`),fetch(`${API}/api/news?published=true`)]);
+        const [eR,vR,sR,nR]=await Promise.all([fetch(`/api/events?limit=1`),fetch(`/api/vendors?limit=1`),fetch(`/api/sponsors`),fetch(`/api/news?published=true`)]);
         const [eD,vD,sD,nD]=await Promise.all([eR.json(),vR.json(),sR.json(),nR.json()]);
         stats={arenas:arenasList.length,events:eD.total||0,vendors:vD.total||0,sponsors:(sD.sponsors||[]).length,news:nD.total||0};
     }catch(e){}
@@ -215,7 +215,7 @@ async function loadProfile() {
 // ════════════════════════════════════════════════
 async function loadEvents() {
     let events=[];
-    try{const r=await fetch(`${API}/api/events?limit=200`);const d=await r.json();events=d.events||[];}catch(e){}
+    try{const r=await fetch(`/api/events?limit=200`);const d=await r.json();events=d.events||[];}catch(e){}
 
     M.innerHTML = card(`
         ${hdr('Events',btn('+ Add Event','showEventForm()'))}
@@ -264,15 +264,15 @@ async function loadEvents() {
 
 function showEventForm(e=null){document.getElementById('eventFormWrap').classList.remove('hidden');document.getElementById('evFormTitle').textContent=e?'Edit Event':'Add Event';document.getElementById('evEditId').value=e?e.id:'';if(e){document.getElementById('evTitle').value=e.title||'';document.getElementById('evArena').value=e.arena_id||'';document.getElementById('evType').value=e.event_type||'';document.getElementById('evDiscipline').value=e.discipline||'';document.getElementById('evStart').value=e.start_date?e.start_date.split('T')[0]:'';document.getElementById('evEnd').value=e.end_date?e.end_date.split('T')[0]:'';document.getElementById('evPromoter').value=e.promoter||'';document.getElementById('evWebsite').value=e.website||'';document.getElementById('evFee').value=e.entry_fee||'';document.getElementById('evDesc').value=e.description||'';}else{['evTitle','evArena','evType','evDiscipline','evStart','evEnd','evPromoter','evWebsite','evFee','evDesc'].forEach(i=>document.getElementById(i).value='');}}
 function hideEventForm(){document.getElementById('eventFormWrap').classList.add('hidden');}
-async function saveEvent(){const id=document.getElementById('evEditId').value;const body={title:document.getElementById('evTitle').value,arena_id:document.getElementById('evArena').value||null,event_type:document.getElementById('evType').value,discipline:document.getElementById('evDiscipline').value,start_date:document.getElementById('evStart').value,end_date:document.getElementById('evEnd').value||null,promoter:document.getElementById('evPromoter').value,website:document.getElementById('evWebsite').value,entry_fee:parseFloat(document.getElementById('evFee').value)||null,description:document.getElementById('evDesc').value};try{await fetch(`${API}/api/events${id?'/'+id:''}`,{method:id?'PUT':'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});loadEvents();}catch(e){alert('Save failed.');}}
-async function approveEv(id){try{await fetch(`${API}/api/events/${id}`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({is_approved:true,status:'approved'})});loadEvents();}catch(e){}}
-async function editEv(id){try{const r=await fetch(`${API}/api/events?limit=500`);const d=await r.json();const e=(d.events||[]).find(x=>x.id===id);if(e)showEventForm(e);}catch(e){}}
+async function saveEvent(){const id=document.getElementById('evEditId').value;const body={title:document.getElementById('evTitle').value,arena_id:document.getElementById('evArena').value||null,event_type:document.getElementById('evType').value,discipline:document.getElementById('evDiscipline').value,start_date:document.getElementById('evStart').value,end_date:document.getElementById('evEnd').value||null,promoter:document.getElementById('evPromoter').value,website:document.getElementById('evWebsite').value,entry_fee:parseFloat(document.getElementById('evFee').value)||null,description:document.getElementById('evDesc').value};try{await fetch('/api/events'+(id?'?id='+id:''),{method:id?'PUT':'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});loadEvents();}catch(e){alert('Save failed.');}}
+async function approveEv(id){try{await fetch(`/api/events?id=${id}`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({is_approved:true,status:'approved'})});loadEvents();}catch(e){}}
+async function editEv(id){try{const r=await fetch(`/api/events?limit=500`);const d=await r.json();const e=(d.events||[]).find(x=>x.id===id);if(e)showEventForm(e);}catch(e){}}
 
 // ════════════════════════════════════════════════
 // 3. VENDOR MANAGER
 // ════════════════════════════════════════════════
 async function loadVendors(){
-    let vendors=[];try{const r=await fetch(`${API}/api/vendors`);const d=await r.json();vendors=d.vendors||[];}catch(e){}
+    let vendors=[];try{const r=await fetch(`/api/vendors`);const d=await r.json();vendors=d.vendors||[];}catch(e){}
     M.innerHTML=card(`
         ${hdr('Vendors',btn('+ Add Vendor','showVendorForm()'))}
         <div id="vnFormWrap" class="hidden mb-5 p-5 bg-navy-600 rounded-xl border border-gold-400/10">
@@ -300,15 +300,15 @@ async function loadVendors(){
     `);
 }
 function showVendorForm(v=null){document.getElementById('vnFormWrap').classList.remove('hidden');document.getElementById('vnFormTitle').textContent=v?'Edit Vendor':'Add Vendor';document.getElementById('vnEditId').value=v?v.id:'';['vnName','vnArena','vnCat','vnBooth','vnEmail','vnWebsite','vnDesc'].forEach(i=>document.getElementById(i).value='');if(v){document.getElementById('vnName').value=v.vendor_name||'';document.getElementById('vnArena').value=v.arena_id||'';document.getElementById('vnCat').value=v.category||'';document.getElementById('vnBooth').value=v.booth_location||'';document.getElementById('vnEmail').value=v.contact_email||'';document.getElementById('vnWebsite').value=v.website||'';document.getElementById('vnDesc').value=v.description||'';}}
-async function saveVendor(){const id=document.getElementById('vnEditId').value;const body={vendor_name:document.getElementById('vnName').value,arena_id:document.getElementById('vnArena').value||null,category:document.getElementById('vnCat').value,booth_location:document.getElementById('vnBooth').value,contact_email:document.getElementById('vnEmail').value,website:document.getElementById('vnWebsite').value,description:document.getElementById('vnDesc').value};try{await fetch(`${API}/api/vendors${id?'/'+id:''}`,{method:id?'PUT':'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});loadVendors();}catch(e){alert('Save failed.');}}
-async function editVn(id){try{const r=await fetch(`${API}/api/vendors`);const d=await r.json();const v=(d.vendors||[]).find(x=>x.id===id);if(v)showVendorForm(v);}catch(e){}}
-async function delVn(id){if(!confirm('Delete this vendor?'))return;try{await fetch(`${API}/api/vendors/${id}`,{method:'DELETE'});loadVendors();}catch(e){}}
+async function saveVendor(){const id=document.getElementById('vnEditId').value;const body={vendor_name:document.getElementById('vnName').value,arena_id:document.getElementById('vnArena').value||null,category:document.getElementById('vnCat').value,booth_location:document.getElementById('vnBooth').value,contact_email:document.getElementById('vnEmail').value,website:document.getElementById('vnWebsite').value,description:document.getElementById('vnDesc').value};try{await fetch('/api/vendors'+(id?'?id='+id:''),{method:id?'PUT':'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});loadVendors();}catch(e){alert('Save failed.');}}
+async function editVn(id){try{const r=await fetch(`/api/vendors`);const d=await r.json();const v=(d.vendors||[]).find(x=>x.id===id);if(v)showVendorForm(v);}catch(e){}}
+async function delVn(id){if(!confirm('Delete this vendor?'))return;try{await fetch(`/api/vendors?id=${id}`,{method:'DELETE'});loadVendors();}catch(e){}}
 
 // ════════════════════════════════════════════════
 // 4. SPONSOR MANAGER
 // ════════════════════════════════════════════════
 async function loadSponsors(){
-    let sponsors=[];try{const r=await fetch(`${API}/api/sponsors`);const d=await r.json();sponsors=d.sponsors||[];}catch(e){}
+    let sponsors=[];try{const r=await fetch(`/api/sponsors`);const d=await r.json();sponsors=d.sponsors||[];}catch(e){}
     const tiers=['platinum','gold','silver','bronze'];
     M.innerHTML=card(`
         ${hdr('Sponsors',btn('+ Add Sponsor','showSponsorForm()'))}
@@ -339,14 +339,14 @@ async function loadSponsors(){
     `);
 }
 function showSponsorForm(s=null){document.getElementById('spFormWrap').classList.remove('hidden');document.getElementById('spFormTitle').textContent=s?'Edit Sponsor':'Add Sponsor';document.getElementById('spEditId').value=s?s.id:'';['spName','spArena','spWebsite','spLogo','spEmail','spStart','spEnd','spValue'].forEach(i=>document.getElementById(i).value='');document.getElementById('spTier').value='bronze';if(s){document.getElementById('spName').value=s.sponsor_name||'';document.getElementById('spArena').value=s.arena_id||'';document.getElementById('spTier').value=s.sponsor_level||'bronze';document.getElementById('spWebsite').value=s.website||'';document.getElementById('spLogo').value=s.logo||'';document.getElementById('spEmail').value=s.contact_email||'';document.getElementById('spStart').value=s.contract_start?s.contract_start.split('T')[0]:'';document.getElementById('spEnd').value=s.contract_end?s.contract_end.split('T')[0]:'';document.getElementById('spValue').value=s.annual_value||'';}}
-async function saveSponsor(){const id=document.getElementById('spEditId').value;const body={sponsor_name:document.getElementById('spName').value,arena_id:document.getElementById('spArena').value||null,sponsor_level:document.getElementById('spTier').value,website:document.getElementById('spWebsite').value,logo:document.getElementById('spLogo').value,contact_email:document.getElementById('spEmail').value,contract_start:document.getElementById('spStart').value||null,contract_end:document.getElementById('spEnd').value||null,annual_value:parseFloat(document.getElementById('spValue').value)||null};try{await fetch(`${API}/api/sponsors${id?'/'+id:''}`,{method:id?'PUT':'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});loadSponsors();}catch(e){alert('Save failed.');}}
-async function editSp(id){try{const r=await fetch(`${API}/api/sponsors`);const d=await r.json();const s=(d.sponsors||[]).find(x=>x.id===id);if(s)showSponsorForm(s);}catch(e){}}
+async function saveSponsor(){const id=document.getElementById('spEditId').value;const body={sponsor_name:document.getElementById('spName').value,arena_id:document.getElementById('spArena').value||null,sponsor_level:document.getElementById('spTier').value,website:document.getElementById('spWebsite').value,logo:document.getElementById('spLogo').value,contact_email:document.getElementById('spEmail').value,contract_start:document.getElementById('spStart').value||null,contract_end:document.getElementById('spEnd').value||null,annual_value:parseFloat(document.getElementById('spValue').value)||null};try{await fetch('/api/sponsors'+(id?'?id='+id:''),{method:id?'PUT':'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});loadSponsors();}catch(e){alert('Save failed.');}}
+async function editSp(id){try{const r=await fetch(`/api/sponsors`);const d=await r.json();const s=(d.sponsors||[]).find(x=>x.id===id);if(s)showSponsorForm(s);}catch(e){}}
 
 // ════════════════════════════════════════════════
 // 5. NEWS PUBLISHER
 // ════════════════════════════════════════════════
 async function loadNews(){
-    let articles=[];try{const r=await fetch(`${API}/api/news?published=true&limit=100`);const d=await r.json();articles=d.news||[];}catch(e){}
+    let articles=[];try{const r=await fetch(`/api/news?published=true&limit=100`);const d=await r.json();articles=d.news||[];}catch(e){}
     M.innerHTML=card(`
         ${hdr('News',btn('+ New Article','showNewsForm()'))}
         <div id="nwFormWrap" class="hidden mb-5 p-5 bg-navy-600 rounded-xl border border-gold-400/10">
@@ -375,7 +375,7 @@ async function loadNews(){
     `);
 }
 function showNewsForm(){document.getElementById('nwFormWrap').classList.remove('hidden');['nwTitle','nwArena','nwImage','nwBody'].forEach(i=>document.getElementById(i).value='');document.getElementById('nwDate').value=new Date().toISOString().split('T')[0];}
-async function saveNews(publish){const body={title:document.getElementById('nwTitle').value,arena_id:document.getElementById('nwArena').value||null,publish_date:document.getElementById('nwDate').value,cover_image_url:document.getElementById('nwImage').value,body:document.getElementById('nwBody').value,is_published:publish};try{await fetch(`${API}/api/news`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});loadNews();}catch(e){alert('Save failed.');}}
+async function saveNews(publish){const body={title:document.getElementById('nwTitle').value,arena_id:document.getElementById('nwArena').value||null,publish_date:document.getElementById('nwDate').value,cover_image_url:document.getElementById('nwImage').value,body:document.getElementById('nwBody').value,is_published:publish};try{await fetch(`/api/news`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});loadNews();}catch(e){alert('Save failed.');}}
 
 // ════════════════════════════════════════════════
 // 6. AI SCRAPER
@@ -438,7 +438,7 @@ async function runScraper(dryRun=false){
 async function loadAnalytics(){
     let data={summary:{total_calls:0,total_tokens:0,total_cost:0,avg_tokens_per_call:0},by_operation:[],daily:[]};
     let days=30;
-    try{const r=await fetch(`${API}/api/llm-usage?days=${days}`);data=await r.json();}catch(e){}
+    try{const r=await fetch(`/api/llm-usage?days=${days}`);data=await r.json();}catch(e){}
     const s=data.summary||{};
 
     M.innerHTML=card(`
@@ -466,7 +466,7 @@ async function loadAnalytics(){
         </div>
     `);
 }
-async function reloadAnalytics(d){try{const r=await fetch(`${API}/api/llm-usage?days=${d}`);const data=await r.json();const s=data.summary||{};/* Re-render with new period — just reload */loadAnalytics();}catch(e){}}
+async function reloadAnalytics(d){try{const r=await fetch(`/api/llm-usage?days=${d}`);const data=await r.json();const s=data.summary||{};/* Re-render with new period — just reload */loadAnalytics();}catch(e){}}
 </script>
 
 </body>

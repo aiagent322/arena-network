@@ -224,7 +224,7 @@ var searchTimer;
 
 // ── Boot ──
 (async function init() {
-    try { var r = await fetch(API+'/api/arenas?limit=200'); var d = await r.json(); allArenas = d.arenas||[]; } catch(e){}
+    try { var r = await fetch('/api/arenas?limit=200'); var d = await r.json(); allArenas = d.arenas||[]; } catch(e){}
     populateArenas();
     await loadArticles();
     document.getElementById('searchBox').addEventListener('input', function(){ clearTimeout(searchTimer); searchTimer = setTimeout(renderList, 300); });
@@ -249,14 +249,14 @@ function populateArenas() {
 // ── Load articles ──
 async function loadArticles() {
     try {
-        var res = await fetch(API+'/api/news?limit=200&published=');
+        var res = await fetch('/api/news?limit=200&published=');
         // Pass empty published to get all (API treats undefined = no filter when explicitly empty)
         var data = await res.json();
         allArticles = data.news || [];
     } catch(e) {
         // Try without published filter
         try {
-            var res2 = await fetch(API+'/api/news?limit=200');
+            var res2 = await fetch('/api/news?limit=200');
             var data2 = await res2.json();
             allArticles = data2.news || [];
         } catch(e2) { allArticles = []; }
@@ -404,7 +404,7 @@ async function saveArticle(publish) {
     };
 
     try {
-        var url = id ? API+'/api/news/'+id : API+'/api/news';
+        var url = id ? '/api/news?id='+id : '/api/news';
         var method = id ? 'PUT' : 'POST';
 
         var res = await fetch(url, {
@@ -431,7 +431,7 @@ async function saveArticle(publish) {
 // ── Toggle publish ──
 async function togglePublish(id, publish) {
     try {
-        var res = await fetch(API+'/api/news/'+id+'/publish', {
+        var res = await fetch('/api/news?id='+id+''/api/news/'+id+'/publish'action=publish', {
             method: 'PUT',
             headers: {'Content-Type':'application/json'},
             body: JSON.stringify({is_published: publish})
@@ -447,7 +447,7 @@ async function togglePublish(id, publish) {
 async function deleteArticle(id, title) {
     if (!confirm('Delete "'+title+'"?\n\nThis cannot be undone.')) return;
     try {
-        var res = await fetch(API+'/api/news/'+id, {method:'DELETE'});
+        var res = await fetch('/api/news?id='+id, {method:'DELETE'});
         if (res.ok) {
             toast('Article deleted', 'warning');
             await loadArticles();

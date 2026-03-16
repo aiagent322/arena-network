@@ -280,7 +280,7 @@ var searchTimer;
 // ── Init ──
 (async function boot() {
     // Load arenas for dropdown
-    try { const r = await fetch(`${API}/api/arenas?limit=200`); const d = await r.json(); allArenas = d.arenas || []; } catch(e) {}
+    try { const r = await fetch(`/api/arenas?limit=200`); const d = await r.json(); allArenas = d.arenas || []; } catch(e) {}
     populateArenaDropdown();
 
     // Load events
@@ -311,7 +311,7 @@ function populateArenaDropdown() {
 // ── Load Events ──
 async function loadEvents() {
     try {
-        const res = await fetch(`${API}/api/events?limit=500`);
+        const res = await fetch(`/api/events?limit=500`);
         const data = await res.json();
         allEvents = data.events || [];
     } catch (err) {
@@ -491,7 +491,7 @@ async function saveEvent() {
     };
 
     try {
-        const url = id ? `${API}/api/events/${id}` : `${API}/api/events`;
+        const url = id ? `/api/events?id=${id}` : `/api/events`;
         const method = id ? 'PUT' : 'POST';
 
         const res = await fetch(url, {
@@ -519,7 +519,7 @@ async function saveEvent() {
 // ── Approve ──
 async function approveEvent(id) {
     try {
-        const res = await fetch(`${API}/api/events/${id}`, {
+        const res = await fetch(`/api/events?id=${id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ is_approved: true, status: 'approved' })
@@ -538,7 +538,7 @@ async function deleteEvent(id, title) {
     if (!confirm(`Delete "${title}"?\n\nThis action cannot be undone.`)) return;
 
     try {
-        const res = await fetch(`${API}/api/events/${id}`, { method: 'DELETE' });
+        const res = await fetch(`/api/events?id=${id}`, { method: 'DELETE' });
         if (res.ok) {
             showToast('Event deleted', 'warning');
             await loadEvents();

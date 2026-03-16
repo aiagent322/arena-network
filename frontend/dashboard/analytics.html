@@ -161,13 +161,13 @@ async function loadAll(){
 }
 
 async function loadEvents(){
-    try{var r=await fetch(API+'/api/events?limit=500&approved=true');var d=await r.json();return d.events||[];}catch(e){return[];}
+    try{var r=await fetch('/api/events?limit=500&approved=true');var d=await r.json();return d.events||[];}catch(e){return[];}
 }
 async function loadVendors(){
-    try{var r=await fetch(API+'/api/vendors?limit=500');var d=await r.json();return d.vendors||[];}catch(e){return[];}
+    try{var r=await fetch('/api/vendors?limit=500');var d=await r.json();return d.vendors||[];}catch(e){return[];}
 }
 async function loadLLM(){
-    try{var r=await fetch(API+'/api/llm-usage?days='+period);return await r.json();}catch(e){return{summary:{},by_operation:[],daily:[],by_arena:[]};}
+    try{var r=await fetch('/api/llm-usage?days='+period);return await r.json();}catch(e){return{summary:{},by_operation:[],daily:[],by_arena:[]};}
 }
 
 // ═══════════════════════════════════════════════
