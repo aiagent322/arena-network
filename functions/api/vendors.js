@@ -1,10 +1,16 @@
 // /api/vendors — GET list, POST create
+
 export async function onRequest(context) {
     const { request, env } = context;
-    if (request.method === 'OPTIONS') return new Response(null, { headers: corsHeaders() });
-    if (request.method === 'GET') return handleGet(request, env.DB);
-    if (request.method === 'POST') return handlePost(request, env.DB);
-    return Response.json({ error: 'Method not allowed' }, { status: 405, headers: corsHeaders() });
+    const m = request.method;
+    if (m === 'OPTIONS') return new Response(null, { headers: corsHeaders() });
+    try {
+        if (m === 'GET') return await handleGet(request, env.DB);
+        if (m === 'POST') return await handlePost(request, env.DB);
+        return Response.json({ error: 'Method not allowed' }, { status: 405, headers: corsHeaders() });
+    } catch (err) {
+        return Response.json({ error: 'Internal server error' }, { status: 500, headers: corsHeaders() });
+    }
 }
 
 async function handleGet(request, db) {
@@ -18,26 +24,19 @@ async function handleGet(request, db) {
 
     let where = ['v.is_active = 1'];
     let binds = [];
-
     if (category) { where.push('v.category = ?'); binds.push(category); }
     if (arena_id) { where.push('v.arena_id = ?'); binds.push(arena_id); }
     if (state) { where.push('(v.state = ? OR a.state = ?)'); binds.push(state, state); }
     if (search) { where.push('(v.vendor_name LIKE ? OR v.category LIKE ? OR v.description LIKE ?)'); binds.push(`%${search}%`, `%${search}%`, `%${search}%`); }
 
-    const whereClause = 'WHERE ' + where.join(' AND ');
+    const wc = 'WHERE ' + where.join(' AND ');
+    const countResult = await db.prepare(`SELECT COUNT(*) as total FROM vendors v LEFT JOIN arenas a ON v.arena_id = a.id ${wc}`).bind(...binds).first();
+    const result = await db.prepare(
+        `SELECT v.*, a.name as arena_name, a.slug as arena_slug, a.city as arena_city, a.state as arena_state
+         FROM vendors v LEFT JOIN arenas a ON v.arena_id = a.id ${wc} ORDER BY v.vendor_name ASC LIMIT ?`
+    ).bind(...binds, limit).all();
 
-    const countResult = await db.prepare(`SELECT COUNT(*) as total FROM vendors v LEFT JOIN arenas a ON v.arena_id = a.id ${whereClause}`).bind(...binds).first();
-
-    const sql = `SELECT v.*, a.name as arena_name, a.slug as arena_slug, a.city as arena_city, a.state as arena_state
-        FROM vendors v LEFT JOIN arenas a ON v.arena_id = a.id
-        ${whereClause} ORDER BY v.vendor_name ASC LIMIT ?`;
-
-    const result = await db.prepare(sql).bind(...binds, limit).all();
-
-    return Response.json({
-        vendors: result.results || [],
-        total: countResult?.total || 0
-    }, { headers: corsHeaders() });
+    return Response.json({ vendors: result.results || [], total: countResult?.total || 0 }, { headers: corsHeaders() });
 }
 
 async function handlePost(request, db) {
@@ -45,7 +44,6 @@ async function handlePost(request, db) {
     if (!body.vendor_name) return Response.json({ error: 'vendor_name required' }, { status: 400, headers: corsHeaders() });
 
     const slug = body.vendor_name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') + '-' + Date.now().toString(36);
-
     const result = await db.prepare(
         `INSERT INTO vendors (arena_id, vendor_name, slug, category, city, state, contact_email, booth_location, website)
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING *`
