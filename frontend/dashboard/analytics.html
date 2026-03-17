@@ -3,6 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta property="og:title" content="Analytics — Arena Network">
+<meta property="og:description" content="Arena Network platform analytics. Event types, calendar density, and LLM usage.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://arena-network.pages.dev/">
+<meta name="twitter:card" content="summary">
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
 <title>Analytics — Arena Network</title>
 <link href="https://fonts.googleapis.com/css2?family=Bitter:wght@600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -65,7 +71,7 @@ canvas{display:block;width:100%!important}
   <div class="pbtn" id="pb"></div>
 </div>
 <div class="wrap">
-  <div class="srow" id="ts"></div>
+  <div class="srow" id="ts"><div style="grid-column:1/-1;text-align:center;padding:12px;color:rgba(200,153,60,.3);font-size:13px;font-weight:600">Loading analytics...</div></div>
   <div class="cg2">
     <div class="chart-card"><h3>Events by Type</h3><canvas id="c1" height="180"></canvas></div>
     <div class="chart-card"><h3>Calendar Density</h3><canvas id="c2" height="180"></canvas></div>

@@ -3,6 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta property="og:title" content="Vendor Directory — Arena Network">
+<meta property="og:description" content="Tack, feed, farrier, veterinary, roping supplies and more. Vendors at agricultural and equine facilities nationwide.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://arena-network.pages.dev/">
+<meta name="twitter:card" content="summary">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <title>Vendor Directory — Arena Network</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -157,7 +163,7 @@ function filt(){
   var f=V.filter(function(v){
     if(s&&(v.vendor_name+' '+(v.category||'')+' '+(v.booth_location||'')+' '+(v.arena_name||'')).toLowerCase().indexOf(s)===-1)return false;
     if(c&&v.category!==c)return false;
-    if(a&&v.arena_id!==a)return false;
+    if(a&&v.arena_slug!==a)return false;
     return true;
   });
   renderV(f);
@@ -171,8 +177,8 @@ function renderV(vs){
 
   var grps={};
   vs.forEach(function(v){
-    var k=v.arena_id||'__ind__';
-    if(!grps[k])grps[k]={id:v.arena_id,name:v.arena_name,city:v.arena_city||v.city,state:v.arena_state||v.state,vendors:[]};
+    var k=v.arena_slug||'__ind__';
+    if(!grps[k])grps[k]={slug:v.arena_slug,name:v.arena_name,city:v.arena_city||v.city,state:v.arena_state||v.state,vendors:[]};
     grps[k].vendors.push(v);
   });
 
@@ -197,7 +203,7 @@ function renderV(vs){
     return '<div class="grp">'+
       '<div class="grp-hdr">'+
         '<div class="grp-icon" style="background:'+(isI?'var(--cream2)':'var(--navy)')+';color:'+(isI?'rgba(11,29,58,.3)':'var(--gold)')+'"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18"/></svg></div>'+
-        '<div><h3>'+(g.id&&!isI?'<a href="arena.html?id='+E(g.id)+'">'+E(g.name)+'</a>':isI?'Independent Vendors':E(g.name))+'</h3>'+
+        '<div><h3>'+(g.slug&&!isI?'<a href="arena.html?id='+E(g.slug)+'">'+E(g.name)+'</a>':isI?'Independent Vendors':E(g.name))+'</h3>'+
           (!isI&&(g.city||g.state)?'<div class="grp-sub">'+E(g.city||'')+((g.city&&g.state)?', ':'')+E(g.state||'')+'</div>':'')+
         '</div>'+
         '<span class="gc">'+g.vendors.length+'</span>'+
@@ -208,7 +214,7 @@ function renderV(vs){
 }
 
 function popA(vs){
-  var m={};vs.forEach(function(v){if(v.arena_id&&v.arena_name)m[v.arena_id]=v.arena_name});
+  var m={};vs.forEach(function(v){if(v.arena_slug&&v.arena_name)m[v.arena_slug]=v.arena_name});
   var sel=document.getElementById('fa');
   Object.entries(m).sort(function(a,b){return a[1].localeCompare(b[1])}).forEach(function(x){
     var o=document.createElement('option');o.value=x[0];o.textContent=x[1];sel.appendChild(o);

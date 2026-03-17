@@ -3,6 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta property="og:title" content="News Publisher — Arena Network">
+<meta property="og:description" content="Publish and manage news articles for Arena Network facilities.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://arena-network.pages.dev/">
+<meta name="twitter:card" content="summary">
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
 <title>News Publisher — Arena Network</title>
 <link href="https://fonts.googleapis.com/css2?family=Bitter:wght@600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -61,6 +67,7 @@ a{text-decoration:none;color:inherit}
 .toast{padding:10px 16px;border-radius:8px;font-size:12px;font-weight:700;margin-bottom:6px;animation:tin .2s ease-out}
 .toast-ok{background:var(--sage);color:#FFF}.toast-err{background:var(--rust);color:#FFF}
 @keyframes tin{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+.loading{text-align:center;padding:40px 16px;color:rgba(200,153,60,.3);font-size:13px;font-weight:600}
 .empty{text-align:center;padding:40px 16px;color:rgba(250,246,239,.15);font-size:13px;display:none}
 
 @media(min-width:640px){.abar{flex-direction:row;align-items:flex-end}.abar>*:first-child{flex:1}.abtn{width:auto;padding:12px 24px}.frow2{flex-direction:row}.frow2>*{flex:1}}
@@ -116,7 +123,7 @@ a{text-decoration:none;color:inherit}
     </div>
   </div>
 
-  <div class="nlist" id="nl"></div>
+  <div class="nlist" id="nl"><div class="loading">Loading articles...</div></div>
   <div class="empty" id="em">No articles yet</div>
 </div>
 </div>

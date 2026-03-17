@@ -3,6 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta property="og:title" content="Dashboard — Arena Network">
+<meta property="og:description" content="Arena Network management dashboard. Overview of arenas, events, vendors, and analytics.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://arena-network.pages.dev/">
+<meta name="twitter:card" content="summary">
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
 <title>Dashboard — Arena Network</title>
 <link href="https://fonts.googleapis.com/css2?family=Bitter:wght@600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -68,7 +74,7 @@ a{text-decoration:none;color:inherit}
 <div class="page">
 <div class="topbar"><div style="display:flex;align-items:center;gap:10px"><button class="hbtn" onclick="tog()"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/></svg></button><h1>Dashboard</h1></div></div>
 <div class="wrap">
-  <div class="srow" id="stats"></div>
+  <div class="srow" id="stats"><div style="grid-column:1/-1;text-align:center;padding:12px;color:rgba(200,153,60,.3);font-size:13px;font-weight:600">Loading...</div></div>
 
   <div class="section">
     <h2>Manage <a href="events.html">All Events →</a></h2>
@@ -82,12 +88,12 @@ a{text-decoration:none;color:inherit}
 
   <div class="section">
     <h2>Recent Events</h2>
-    <div id="revents"></div>
+    <div id="revents"><div class="empty" style="display:block">Loading events...</div></div>
   </div>
 
   <div class="section">
     <h2>Latest News</h2>
-    <div id="rnews"></div>
+    <div id="rnews"><div class="empty" style="display:block">Loading news...</div></div>
   </div>
 </div>
 <div class="ft"><div class="br">Arena Network Dashboard</div><div class="cp">&copy; 2026 Arena Network</div></div>
