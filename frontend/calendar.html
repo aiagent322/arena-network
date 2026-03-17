@@ -175,7 +175,7 @@ function renderList(){
     var venue=e.arena_name||'';
     var loc=e.arena_city?(e.arena_city+(e.arena_state?', '+e.arena_state:'')):'';
     var venueHtml=venue;
-    if(venue&&e.arena_slug) venueHtml='<a href="arena.html?id='+E(e.arena_slug)+'" style="color:var(--gold);font-weight:600">'+E(venue)+'</a>';
+    if(venue&&e.arena_slug) venueHtml='<a href="/arena/'+E(e.arena_slug)+'" style="color:var(--gold);font-weight:600">'+E(venue)+'</a>';
     else if(venue) venueHtml=E(venue);
     // Date range for multi-day events
     var dateStr='';

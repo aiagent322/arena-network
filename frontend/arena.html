@@ -153,7 +153,10 @@ document.getElementById('mb').onclick=function(){document.getElementById('mn').c
 
 var D=null;
 (async function(){
-  var id=new URLSearchParams(window.location.search).get('id')||new URLSearchParams(window.location.search).get('slug');
+  // Support both /arena/westworld-scottsdale and /arena?id=westworld-scottsdale
+  var path=window.location.pathname.replace(/\/$/,'');
+  var pathSlug=path.startsWith('/arena/')?path.split('/arena/')[1]:null;
+  var id=pathSlug||new URLSearchParams(window.location.search).get('id')||new URLSearchParams(window.location.search).get('slug');
   if(!id){err();return}
   try{
     var r=await fetch('/api/arenas?slug='+encodeURIComponent(id));

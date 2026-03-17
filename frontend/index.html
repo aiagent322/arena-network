@@ -276,7 +276,7 @@ function grid(a){
     var tp=cap(a.arena_type||'equine');
     var dc='d'+({equine:'e',rodeo:'r','multi-use':'m',fairgrounds:'f',agricultural:'a'}[a.arena_type]||'e');
     var dl=Math.min(i*.04,.5);
-    return '<a href="arena.html?id='+E(a.slug)+'" class="card" style="animation-delay:'+dl+'s">'+
+    return '<a href="/arena/'+E(a.slug)+'" class="card" style="animation-delay:'+dl+'s">'+
       '<div class="ca"></div><div class="cb">'+
       '<div class="cn"><h3>'+E(a.name)+'</h3>'+(a.is_verified?'<span class="vb"><svg viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.403 12.652a3 3 0 0 0 0-5.304 3 3 0 0 0-3.75-3.751 3 3 0 0 0-5.305 0 3 3 0 0 0-3.751 3.75 3 3 0 0 0 0 5.305 3 3 0 0 0 3.75 3.751 3 3 0 0 0 5.305 0 3 3 0 0 0 3.751-3.75Zm-2.546-4.46a.75.75 0 0 0-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 1 0-1.06 1.061l2.5 2.5a.75.75 0 0 0 1.137-.089l4-5.5Z" clip-rule="evenodd"/></svg>Verified</span>':'')+'</div>'+
       '<div class="cl"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/><path d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 0 1 15 0Z"/></svg>'+E(a.city||'')+((a.city&&a.state)?', ':'')+E(a.state||'')+'</div>'+

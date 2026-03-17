@@ -203,7 +203,7 @@ function renderV(vs){
     return '<div class="grp">'+
       '<div class="grp-hdr">'+
         '<div class="grp-icon" style="background:'+(isI?'var(--cream2)':'var(--navy)')+';color:'+(isI?'rgba(11,29,58,.3)':'var(--gold)')+'"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18"/></svg></div>'+
-        '<div><h3>'+(g.slug&&!isI?'<a href="arena.html?id='+E(g.slug)+'">'+E(g.name)+'</a>':isI?'Independent Vendors':E(g.name))+'</h3>'+
+        '<div><h3>'+(g.slug&&!isI?'<a href="/arena/'+E(g.slug)+'">'+E(g.name)+'</a>':isI?'Independent Vendors':E(g.name))+'</h3>'+
           (!isI&&(g.city||g.state)?'<div class="grp-sub">'+E(g.city||'')+((g.city&&g.state)?', ':'')+E(g.state||'')+'</div>':'')+
         '</div>'+
         '<span class="gc">'+g.vendors.length+'</span>'+
